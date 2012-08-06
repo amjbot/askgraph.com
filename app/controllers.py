@@ -24,7 +24,51 @@ class upload( BaseHandler ):
         self.render( "upload.html" )
     @tornado.web.authenticated
     def post( self ):
-        raise tornado.web.HTTPError(401)
+        def unpack_csv( s ):
+            l = []
+            buffer = ''
+            string_close = ''
+            for c in s:
+                if string_close==c:
+                    string_close = ''
+                elif string_close:
+                    buffer += c
+                elif c=='"':
+                    string_close = '"'
+                elif c==',':
+                    l.append( buffer )
+                    buffer = ''
+                else:
+                    buffer += c
+            if buffer:
+                l.append( buffer )
+            return l
+        file = self.request.files['file'][0]
+        if file['content_type'] != 'text/csv':
+            raise HTTPError(415)
+        dataset = file['filename'].split('.')[0]
+        headers = []
+        documents = []
+        for i,line in enumerate(file['body'].split('\n')):
+            if i==0:
+                headers = unpack_csv(line)
+            elif line:
+                documents.append( unpack_csv(line) )
+        if headers and documents:
+            db.execute("DELETE FROM document_headers WHERE dataset=%s", dataset)
+            db.execute("DELETE FROM documents WHERE dataset=%s", dataset)
+            db.execute("INSERT document_headers(dataset," + \
+                       ",".join( ("key"+str(i)) for i in range(len(headers)) ) + \
+                       ") VALUES(" + \
+                       ",".join( "%s" for i in range(len(headers)+1) ) + \
+                       ")", dataset, *headers)
+            for d in documents:
+                db.execute("INSERT documents(dataset," + \
+                           ",".join( ("val"+str(i)) for i in range(len(headers)) ) + \
+                           ") VALUES (" + \
+                           ",".join( "%s" for i in range(len(headers)+1) ) + \
+                           ")", dataset, *d)
+        self.redirect("/d/"+dataset)
 
 class authenticate( BaseHandler ):
     def get( self ):
@@ -42,12 +86,7 @@ class document( BaseHandler ):
         doc = doc.split('/')
         if len(doc) < 1:
             raise tornado.web.HTTPError(400)
-        while len(doc) < 11:
-            doc.append( '' )
         header = db.get("SELECT * FROM document_headers WHERE dataset=%s", doc[0])
-        documents = db.query("SELECT * FROM documents WHERE dataset=%s AND "
-           "(%s IN (val0,'') AND (%s IN (val1,'') AND (%s IN (val2,'') AND "
-           "(%s IN (val3,'') AND (%s IN (val4,'') AND (%s IN (val5,'') AND "
-           "(%s IN (val6,'') AND (%s IN (val7,'') AND (%s IN (val8,'') AND "
-           "(%s IN (val9,'')", *doc)
+        documents = db.query("SELECT * FROM documents WHERE dataset=%s AND " +
+           " AND ".join( ("(%s IN (val"+str(i)+",'')") for i in range(len(doc)-1) ), *doc)
         self.render( "document.html", header=header, documents=documents)
