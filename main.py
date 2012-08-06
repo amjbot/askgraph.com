@@ -15,6 +15,7 @@ settings = dict(
 
 application = tornado.web.Application( [
     ( "^/",                      controllers.index        ),
+    ( "^/upload",                controllers.upload       ),
     ( "^/d/(?P<doc>.+)",         controllers.document     ),
 ], **settings )
 

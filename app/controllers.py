@@ -4,19 +4,24 @@ import md5
 import random
 import string
 import smtplib
+import logging
 from email.mime.text import MIMEText
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
-class BaseHandler( tornado.web.RequestHandler ):
-    pass
-
-class index( BaseHandler ):
+class index( tornado.web.RequestHandler ):
     def get( self ):
         headers = db.query("SELECT * FROM document_headers")
         self.render( "document.html", documents=headers )
 
-class document( BaseHandler ):
+class upload( tornado.web.RequestHandler ):
+    def get( self ):
+        self.render( "upload.html" )
+    def post( self ):
+        logging.warn( str(self.request.headers) )
+        raise tornado.web.HTTPError(401)
+
+class document( tornado.web.RequestHandler ):
     def get( self, doc ):
         doc = doc.split('/')
         if len(doc) < 1:

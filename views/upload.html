@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% include "_header.html" %}
+  <form method="post" enctype="multipart/form-data">
+     <label for="file">Upload a file:</label>
+     <input id="file" name="file" type="file" name="somename" size="chars">
+     <input type="submit" value="Send" />
+  </form>
+  {% include "_footer.html" %}
+{% end %}
