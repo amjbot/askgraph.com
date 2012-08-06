@@ -9,19 +9,35 @@ from email.mime.text import MIMEText
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
-class index( tornado.web.RequestHandler ):
+class BaseHandler( tornado.web.RequestHandler ):
+    def get_current_user( self ):
+        return self.get_secure_cookie("user")
+
+class index( BaseHandler ):
     def get( self ):
         headers = db.query("SELECT * FROM document_headers")
         self.render( "document.html", documents=headers )
 
-class upload( tornado.web.RequestHandler ):
+class upload( BaseHandler ):
+    @tornado.web.authenticated
     def get( self ):
         self.render( "upload.html" )
+    @tornado.web.authenticated
     def post( self ):
-        logging.warn( str(self.request.headers) )
         raise tornado.web.HTTPError(401)
 
-class document( tornado.web.RequestHandler ):
+class authenticate( BaseHandler ):
+    def get( self ):
+        next = self.get_argument("next","/")
+        self.render( "authenticate.html", next=next )
+    def post( self ):
+        next = self.get_argument("next","/") or "/"
+        name = self.get_argument("name")
+        password = self.get_argument("pass")
+        self.set_secure_cookie("user",name)
+        self.redirect(next)
+
+class document( BaseHandler ):
     def get( self, doc ):
         doc = doc.split('/')
         if len(doc) < 1:
