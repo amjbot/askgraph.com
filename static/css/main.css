@@ -1,0 +1,40 @@
+html { background-color: #300a24; }
+body { width:960px; margin-top: 5px; margin-left:auto; margin-right:auto; color: #FFFFFF }
+
+a:link, a:visited, a:hover, a:active { color:#FFFFFF }
+a:link, a:visited { text-decoration: none }
+a:hover, a:active { text-decoration: underline }
+span > a { display: inline-block; margin: 15px }
+
+h1 { font-family: serif; font-size: 3em; margin: 0.67em 0 0.33em }
+h2 { font-family: serif; font-size: 1.7em; margin: 0.67em 0 0.33em }
+
+body > header { border-bottom: 1px solid #FFFFFF; }
+body > footer { text-align: center; margin-top: 25px; margin-bottom: 15px; }
+
+section { padding: 15px 0; }
+section > header { border-bottom: 3px groove #FFFFFF; }
+
+article { display: table; }
+time:before { content: "published: " }
+figure { float: left; margin-right: 15px; }
+img { width: 150px; }
+
+
+.indent { margin-left: 60px }
+.half-page { width: 480px; margin-left: auto; margin-right: auto; }
+.half-page input { width: 340px } 
+label { width: 120px; display: inline-block; }
+input, textarea, select {
+   margin: 7px 0;
+   border: 1px solid #555;
+   padding: 0.5em;
+   font-size: 15px;
+   line-height: 1.2em;
+   background: #fff;
+   background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ccc));
+   -webkit-appearance: none;
+   -webkit-box-shadow: 1px 1px 1px #fff;
+   -webkit-border-radius: 0.5em;
+ }
+input[type="submit"] { width: 100%; }
