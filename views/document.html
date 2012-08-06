@@ -2,8 +2,19 @@
 
 {% block content %}
   {% include "_header.html" %}
-  <section>
-    This is the place for landing page content.
-  </section>
+  <table>
+    <tr>
+      {% for row in header %}
+        <th>{{ row }}</th>
+      {% end %}
+    </tr>
+    {% for d in documents %}
+    <tr>
+      {% for row in d %}
+        <td>{{ row }}</td>
+      {% end %}
+    </tr>
+    {% end %}
+  </table>
   {% include "_footer.html" %}
 {% end %}
