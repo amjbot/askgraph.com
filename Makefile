@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 deploy-web:
-	#sudo nohup killall -q python > /dev/null 2> /dev/null < /dev/null
+	sudo killall -q python || true
 	sudo nohup python main.py >> /dev/null 2>> /dev/null < /dev/null &
 
 reset-database:

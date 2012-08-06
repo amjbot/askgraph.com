@@ -1,12 +1,6 @@
+{% import time %}
 <header>
   <span>
-    <a href="/">Home</a>
-  </span>
-  <span style="float: right">
-    {% if current_user %}
-      <a href="/user">{{ current_user.name }}</a>
-    {% else %}
-      <a href="/authenticate">Authenticate</a>
-    {% end %}
+    Page rendered at {{ time.ctime() }}
   </span>
 </header>
