@@ -2,19 +2,21 @@
 
 {% block content %}
   {% include "_header.html" %}
+  {% include "_subheader.html" %}
   <table>
     <tr>
       {% for row in header %}
-        <th>{{ row }}</th>
+        <th><a href="{{ row.url }}">{{ row.text }}</a></th>
       {% end %}
     </tr>
     {% for d in documents %}
     <tr>
       {% for row in d %}
-        <td>{{ row }}</td>
+        <td><a href="{{ row.url }}">{{ row.text }}</a></td>
       {% end %}
     </tr>
     {% end %}
   </table>
+  {% include "_related.html" %}
   {% include "_footer.html" %}
 {% end %}
