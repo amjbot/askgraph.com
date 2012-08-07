@@ -19,7 +19,8 @@ def dbrow_to_tablerow( row ):
     for key,value in sorted(row.items()):
         if not (key.startswith("key") or key.startswith("val")):
             continue
-        url_prefix += ("/k/" if key.startswith("key") else "/v/") + repr(value)
+        url_prefix += ("/k/" if key.startswith("key") else "/v/") \
+                    + (value if (isinstance(value,str) or isinstance(value,unicode)) else repr(value))
         output.append(tornado.database.Row({"text": value, "url":url_prefix}))
     return output
 
@@ -109,3 +110,5 @@ class document( BaseHandler ):
         header = dbrow_to_tablerow(header)
         documents = map(dbrow_to_tablerow,documents)
         self.render( "document.html", dataset=dataset, header=header, documents=documents)
+
+
