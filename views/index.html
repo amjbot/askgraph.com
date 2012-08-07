@@ -4,11 +4,11 @@
   {% include "_header.html" %}
   <table class="document">
     <tr>
-      <th>Dataset</th>
+      <th><a>Dataset</a></th>
     </tr>
     {% for h in headers %}
     <tr>
-      <th><a href="{{ h.url }}">{{ h.text }}</a></th>
+      <td><a href="{{ h.url }}">{{ h.text }}</a></td>
     </tr>
     {% end %}
   </table>
