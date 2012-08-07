@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% include "_header.html" %}
+  <table class="document">
+    <tr>
+      <th>Dataset</th>
+    </tr>
+    {% for h in headers %}
+    <tr>
+      <th><a href="{{ h.url }}">{{ h.text }}</a></th>
+    </tr>
+    {% end %}
+  </table>
+  {% include "_footer.html" %}
+{% end %}

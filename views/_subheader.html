@@ -1,0 +1,14 @@
+<div class="breadcrumb">
+  <span>
+    <a href="/">Askgraph</a>
+    {#
+    {% for t in topic %}
+      &gt;
+      <a href="{{ t.url }}">{{ t.name }}</a>
+    {% end %}
+    #}
+  </span>
+  <span style="float: right">
+    download as <a href="">csv</a>
+  </span>
+</div>

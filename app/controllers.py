@@ -16,7 +16,7 @@ class BaseHandler( tornado.web.RequestHandler ):
 class index( BaseHandler ):
     def get( self ):
         headers = db.query("SELECT * FROM document_headers")
-        self.render( "document.html", documents=headers )
+        self.render( "index.html", headers=headers )
 
 class upload( BaseHandler ):
     @tornado.web.authenticated
