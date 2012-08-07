@@ -13,13 +13,12 @@ def dbrow_to_dataset( row ):
     dataset = row['dataset']
     return tornado.database.Row({"text":dataset , "url":"/d/"+dataset})
 def dbrow_to_tablerow( row ):
-    #input  = { dataset:?, key0:?, key1:?, ... }
-    #       | { dataset:?, val0:?, val1:?, ... }
-    #output = [{ url:?, text:? }]
     output = []
     dataset = row.pop('dataset')
     url_prefix = '/d/'+dataset
     for key,value in sorted(row.items()):
+        if not (key.startswith("key") or key.startswith("val")):
+            continue
         url_prefix += ("/k/" if key.startswith("key") else "/v/") + repr(value)
         output.append(tornado.database.Row({"text": value, "url":url_prefix}))
     return output
@@ -103,10 +102,10 @@ class document( BaseHandler ):
         if len(doc) < 1:
             raise tornado.web.HTTPError(400)
         header = db.get("SELECT * FROM document_headers WHERE dataset=%s", doc[0])
-        documents = db.query("SELECT * FROM documents WHERE dataset=%s", doc[0])
         dataset = header['dataset']
-        header = [ header['key'+str(i)] for i in range(len(header)-2) ]
-        documents = [ [d['val'+str(i)] for i in range(len(header)-2)] for d in documents ]
+        documents = db.query("SELECT * FROM documents WHERE dataset=%s", doc[0])
         #documents = db.query("SELECT * FROM documents WHERE dataset=%s AND " +
         #   " AND ".join( ("%s=val"+str(i)) for i in range(len(doc)-1) ), *doc)
+        header = dbrow_to_tablerow(header)
+        documents = map(dbrow_to_tablerow,documents)
         self.render( "document.html", dataset=dataset, header=header, documents=documents)
