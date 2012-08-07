@@ -9,6 +9,21 @@ from email.mime.text import MIMEText
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
+def dbrow_to_dataset( row ):
+    dataset = row['dataset']
+    return tornado.database.Row({"text":dataset , "url":"/d/"+dataset})
+def dbrow_to_tablerow( row ):
+    #input  = { dataset:?, key0:?, key1:?, ... }
+    #       | { dataset:?, val0:?, val1:?, ... }
+    #output = [{ url:?, text:? }]
+    output = []
+    dataset = row.pop('dataset')
+    url_prefix = '/d/'+dataset
+    for key,value in sorted(row.items()):
+        url_prefix += ("/k/" if key.startswith("key") else "/v/") + repr(value)
+        output.append(tornado.database.Row({"text": value, "url":url_prefix}))
+    return output
+
 class BaseHandler( tornado.web.RequestHandler ):
     def get_current_user( self ):
         return self.get_secure_cookie("user")
@@ -16,6 +31,7 @@ class BaseHandler( tornado.web.RequestHandler ):
 class index( BaseHandler ):
     def get( self ):
         headers = db.query("SELECT * FROM document_headers")
+        headers = map(dbrow_to_dataset,headers)
         self.render( "index.html", headers=headers )
 
 class upload( BaseHandler ):
