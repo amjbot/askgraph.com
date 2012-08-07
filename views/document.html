@@ -6,13 +6,13 @@
   <table>
     <tr>
       {% for row in header %}
-        <th><a href="{{ row.url }}">{{ row.text }}</a></th>
+        <th><a href="{{ request.path+row.url }}">{{ row.text }}</a></th>
       {% end %}
     </tr>
     {% for d in documents %}
     <tr>
       {% for row in d %}
-        <td><a href="{{ row.url }}">{{ row.text }}</a></td>
+        <td><a href="{{ request.path+row.url }}">{{ row.text }}</a></td>
       {% end %}
     </tr>
     {% end %}

@@ -1,5 +1,7 @@
 import tornado.web
 import tornado.database
+import tornado.escape
+import urllib
 import md5
 import random
 import string
@@ -15,13 +17,12 @@ def dbrow_to_dataset( row ):
 def dbrow_to_tablerow( row ):
     output = []
     dataset = row.pop('dataset')
-    url_prefix = '/d/'+dataset
     for key,value in sorted(row.items()):
         if not (key.startswith("key") or key.startswith("val")):
             continue
-        url_prefix += ("/k/" if key.startswith("key") else "/v/") \
-                    + (value if (isinstance(value,str) or isinstance(value,unicode)) else repr(value))
-        output.append(tornado.database.Row({"text": value, "url":url_prefix}))
+        url = ("/"+key+"/") \
+            + urllib.quote(value if (isinstance(value,str) or isinstance(value,unicode)) else repr(value))
+        output.append(tornado.database.Row({"text": value, "url":url}))
     return output
 
 class BaseHandler( tornado.web.RequestHandler ):
@@ -57,7 +58,7 @@ class upload( BaseHandler ):
                 else:
                     buffer += c
             if buffer:
-                l.append( buffer )
+                l.append( buffer.strip() )
             return l
         file = self.request.files['file'][0]
         if file['content_type'] != 'text/csv':
