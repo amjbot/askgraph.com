@@ -495,6 +495,6 @@ textarea {
  */
 
 table {
-    border-collapse: collapse;
+    /* border-collapse: collapse; *//* remove due to breaking of table styles */
     border-spacing: 0;
 }

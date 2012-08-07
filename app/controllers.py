@@ -18,7 +18,7 @@ def dbrow_to_tablerow( row ):
     output = []
     dataset = row.pop('dataset')
     for key,value in sorted(row.items()):
-        if not (key.startswith("key") or key.startswith("val")):
+        if not (key.startswith("key") or key.startswith("val")) or value=='':
             continue
         url = ("/"+key+"/") \
             + urllib.quote(value if (isinstance(value,str) or isinstance(value,unicode)) else repr(value))
