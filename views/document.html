@@ -3,7 +3,7 @@
 {% block content %}
   {% include "_header.html" %}
   {% include "_subheader.html" %}
-  <table class="document">
+  <table class="document result">
     <tr>
       {% for row in header %}
         <th><a href="{{ request.path+row.url }}">{{ row.text }}</a></th>
