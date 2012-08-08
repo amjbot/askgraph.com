@@ -24,6 +24,12 @@ def dbrow_to_tablerow( row ):
             + urllib.quote(value if (isinstance(value,str) or isinstance(value,unicode)) else repr(value))
         output.append(tornado.database.Row({"text": value, "url":url}))
     return output
+def csv_repr( v ):
+    if not (isinstance(v,str) or isinstance(v,unicode)):
+        return repr(v)
+    else:
+        return '"' + v.replace('"','\\"') + '"'
+        
 
 class BaseHandler( tornado.web.RequestHandler ):
     def get_current_user( self ):
@@ -98,18 +104,35 @@ class authenticate( BaseHandler ):
         self.set_secure_cookie("user",name)
         self.redirect(next)
 
-class document( BaseHandler ):
-    def get( self, doc ):
-        doc = doc.split('/')
-        if len(doc) < 1:
-            raise tornado.web.HTTPError(400)
-        header = db.get("SELECT * FROM document_headers WHERE dataset=%s", doc[0])
-        dataset = header['dataset']
-        documents = db.query("SELECT * FROM documents WHERE dataset=%s", doc[0])
-        #documents = db.query("SELECT * FROM documents WHERE dataset=%s AND " +
-        #   " AND ".join( ("%s=val"+str(i)) for i in range(len(doc)-1) ), *doc)
-        header = dbrow_to_tablerow(header)
-        documents = map(dbrow_to_tablerow,documents)
-        self.render( "document.html", dataset=dataset, header=header, documents=documents)
 
+def query_document( doc ):
+    header = db.get("SELECT * FROM document_headers WHERE dataset=%s", doc[0])
+    dataset = header['dataset']
+    documents = db.query("SELECT * FROM documents WHERE dataset=%s", doc[0])
+    #documents = db.query("SELECT * FROM documents WHERE dataset=%s AND " +
+    #   " AND ".join( ("%s=val"+str(i)) for i in range(len(doc)-1) ), *doc)
+    header = dbrow_to_tablerow(header)
+    documents = map(dbrow_to_tablerow,documents)
+    return dataset,header,documents
+
+class document( BaseHandler ):
+    def get( self, q ):
+        query = q.split('/')
+        if len(query) < 1:
+            raise tornado.web.HTTPError(400)
+        dataset,header,documents = query_document(query)
+        self.render( "document.html", q=q, dataset=dataset, header=header, documents=documents)
+
+class download( BaseHandler ):
+    def get( self, q ):
+        query = q.split('/')
+        if len(query) < 1:
+            raise tornado.web.HTTPError(400)
+        dataset,header,documents = query_document(query)
+        self.set_header('Content-Type', 'text/csv')
+        self.set_header('Content-Disposition', 'attachment; filename='+dataset+'.csv')
+        output = ",".join( csv_repr(c.text) for c in header )
+        for d in documents:
+            output += "\n" + ",".join( csv_repr(c.text) for c in d )
+        self.write(output)
 

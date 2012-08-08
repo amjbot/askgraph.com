@@ -17,7 +17,8 @@ application = tornado.web.Application( [
     ( "^/",                      controllers.index        ),
     ( "^/upload",                controllers.upload       ),
     ( "^/authenticate",          controllers.authenticate ),
-    ( "^/d/(?P<doc>.+)",         controllers.document     ),
+    ( "^/d/(?P<q>.+)",           controllers.document     ),
+    ( "^/download/(?P<q>.+)",    controllers.download     ),
 ], **settings )
 
 
