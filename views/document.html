@@ -2,17 +2,20 @@
 
 {% block content %}
   {% include "_header.html" %}
-    <div class="breadcrumb">
-    {#
-    {% for t in topic %}
-      &gt;
-      <a href="{{ t.url }}">{{ t.name }}</a>
+  <section>
+    {% set q_dataset = q.split("/")[0] %}
+    {% set q_query = q.split("/")[1:] %}
+    {% set q_url = "/d/" + q_dataset %}
+    <b><a href="{{ q_url }}">{{ q_dataset }}</a></b> &nbsp;&nbsp;&gt;&nbsp;&nbsp;
+    {% while q_query != [] %}
+      {% set q_keyval = q_query[:2] %}
+      {% set q_query = q_query[2:] %}
+      {% set q_url = q_url + "/" + "/".join(q_keyval) %}
+      <b><a href="{{ q_url }}">{{ ": ".join(q_keyval) }}</a></b>
+      &nbsp;&nbsp;&gt;&nbsp;&nbsp;
     {% end %}
-    #}
-    <span style="float: right">
-      <a href="/download/{{ q }}">download as csv</a>
-    </span>
-  </div>
+    <b><a href="/download/{{ q }}">download as csv</a></b>
+  </section>
 
   <table class="document result">
     <tr>

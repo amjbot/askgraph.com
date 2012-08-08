@@ -14,7 +14,7 @@ a:hover, a:active { text-decoration: underline }
 h1 { font-family: serif; font-size: 3em; margin: 0.67em 0 0.33em }
 h2 { font-family: serif; font-size: 1.7em; margin: 0.67em 0 0.33em }
 
-body > header { border-bottom: 1px solid #222222; }
+body > header { border-bottom: 1px solid #222222; margin-bottom: 15px; }
 body > footer { text-align: center; margin-top: 25px; margin-bottom: 15px; }
 
 section { padding: 15px 0; }
@@ -46,7 +46,6 @@ input[type="submit"] { width: 100%; }
 
 
 table.document {
-    margin: 20px;
     background: #eaebec;
     border: #ccc 1px solid;
     -moz-border-radius: 3px;

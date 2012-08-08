@@ -94,6 +94,11 @@ class upload( BaseHandler ):
                            ")", dataset, *d)
         self.redirect("/d/"+dataset)
 
+
+class signout( BaseHandler ):
+    def get( self ):
+        self.clear_cookie("user")
+        self.redirect( self.request.headers.get('Referer','/') )
 class authenticate( BaseHandler ):
     def get( self ):
         next = self.get_argument("next","/")

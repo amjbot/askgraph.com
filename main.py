@@ -18,6 +18,7 @@ application = tornado.web.Application( [
     ( "^/privacy",               controllers.privacy      ),
     ( "^/upload",                controllers.upload       ),
     ( "^/authenticate",          controllers.authenticate ),
+    ( "^/signout",               controllers.signout      ),
     ( "^/d/(?P<q>.+)",           controllers.document     ),
     ( "^/download/(?P<q>.+)",    controllers.download     ),
 ], **settings )
