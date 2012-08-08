@@ -1,9 +1,9 @@
 {% import time %}
 <header>
-  <span>
-    Page rendered at {{ time.ctime() }}
-  </span>
+  <a href="/">Page rendered at {{ time.ctime() }}</a>
+  {% if current_user %}
   <span style="float: right">
     {{ current_user }}
   </span>
+  {% end %}
 </header>

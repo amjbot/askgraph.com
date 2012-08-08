@@ -5,9 +5,7 @@ import urllib
 import md5
 import random
 import string
-import smtplib
 import logging
-from email.mime.text import MIMEText
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
@@ -40,6 +38,9 @@ class index( BaseHandler ):
         headers = db.query("SELECT * FROM document_headers")
         headers = map(dbrow_to_dataset,headers)
         self.render( "index.html", headers=headers )
+class privacy( BaseHandler ):
+    def get( self ):
+        self.render( "privacy.html" )
 
 class upload( BaseHandler ):
     @tornado.web.authenticated
