@@ -6,6 +6,7 @@ import md5
 import random
 import string
 import logging
+import sys
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
@@ -14,7 +15,7 @@ def dbrow_to_dataset( row ):
     return tornado.database.Row({"text":dataset , "url":"/d/"+dataset})
 def dbrow_to_tablerow( row ):
     output = []
-    dataset = row.pop('dataset')
+    dataset = row['dataset']
     for key,value in sorted(row.items()):
         if not (key.startswith("key") or key.startswith("val")) or value=='':
             continue
@@ -51,12 +52,18 @@ class upload( BaseHandler ):
         def unpack_csv( s ):
             l = []
             buffer = ''
+            escape = False
             string_close = ''
             for c in s:
                 if string_close==c:
                     string_close = ''
                 elif string_close:
                     buffer += c
+                elif c=='\\':
+                    escape = True
+                elif escape:
+                    buffer += c
+                    escape = False
                 elif c=='"':
                     string_close = '"'
                 elif c==',':
@@ -112,11 +119,27 @@ class authenticate( BaseHandler ):
 
 
 def query_document( doc ):
-    header = db.get("SELECT * FROM document_headers WHERE dataset=%s", doc[0])
-    dataset = header['dataset']
-    documents = db.query("SELECT * FROM documents WHERE dataset=%s", doc[0])
-    #documents = db.query("SELECT * FROM documents WHERE dataset=%s AND " +
-    #   " AND ".join( ("%s=val"+str(i)) for i in range(len(doc)-1) ), *doc)
+    dataset = doc[0]
+    query = doc[1:]
+    rows = {}
+    columns = {}
+    while len(query)>0:
+        key = query.pop(0)
+        try:
+            val = query.pop(0)
+        except IndexError:
+            val = None
+        if key.startswith('key'):
+            rows[key] = val
+        else:
+            columns[key] = val
+    header = db.get("SELECT * FROM document_headers WHERE dataset=%s", dataset)
+    header = dict((k,v) for (k,v) in header.items() if (len(rows)==0 or k=='dataset' or k in rows))
+    documents = db.query("SELECT * FROM documents WHERE dataset=%s", dataset)
+    documents = [
+        dict( (k,v) for (k,v) in d.items() if (len(rows)==0 or k=='dataset' or k.replace('val','key') in rows) )
+        for d in documents if all(d.get(k)==v for (k,v) in columns.items())
+    ]
     header = dbrow_to_tablerow(header)
     documents = map(dbrow_to_tablerow,documents)
     return dataset,header,documents
