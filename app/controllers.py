@@ -99,7 +99,7 @@ class upload( BaseHandler ):
                            ") VALUES (" + \
                            ",".join( "%s" for i in range(len(headers)+1) ) + \
                            ")", dataset, *d)
-        self.redirect("/d/"+dataset)
+        self.redirect("/d/"+urllib.quote(dataset))
 
 
 class signout( BaseHandler ):
@@ -118,7 +118,7 @@ class authenticate( BaseHandler ):
         self.redirect(next)
 
 
-def query_document( doc ):
+def query_document( doc, page=0, perpage=999999 ):
     dataset = doc[0]
     query = doc[1:]
     rows = {}
@@ -135,7 +135,7 @@ def query_document( doc ):
             columns[key] = val
     header = db.get("SELECT * FROM document_headers WHERE dataset=%s", dataset)
     header = dict((k,v) for (k,v) in header.items() if (len(rows)==0 or k=='dataset' or k in rows))
-    documents = db.query("SELECT * FROM documents WHERE dataset=%s", dataset)
+    documents = db.query("SELECT * FROM documents WHERE dataset=%s limit %s,%s", dataset, page*perpage, (page+1)*perpage)
     documents = [
         dict( (k,v) for (k,v) in d.items() if (len(rows)==0 or k=='dataset' or k.replace('val','key') in rows) )
         for d in documents if all(d.get(k)==v for (k,v) in columns.items())
@@ -149,8 +149,9 @@ class document( BaseHandler ):
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        dataset,header,documents = query_document(query)
-        self.render( "document.html", q=q, dataset=dataset, header=header, documents=documents)
+        dataset,header,documents = query_document(query, page=0, perpage=1000)
+        partial = len(documents)==1000
+        self.render( "document.html", q=q, dataset=dataset, header=header, documents=documents, partial=partial)
 
 class download( BaseHandler ):
     def get( self, q ):

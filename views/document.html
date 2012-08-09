@@ -17,7 +17,7 @@
     <b><a href="/download/{{ q }}">download as csv</a></b>
   </section>
 
-  <table class="document result">
+  <table class="document result{% if partial %} partial{% end %}">
     <tr>
       {% for row in header %}
         <th><a href="{{ request.path+row.url }}">{{ row.text }}</a></th>
