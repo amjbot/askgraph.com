@@ -144,21 +144,22 @@ def query_document( doc, page=0, perpage=999999 ):
     documents = map(dbrow_to_tablerow,documents)
     return dataset,header,documents
 
+PERPAGE = 300
 class document( BaseHandler ):
     def get( self, q ):
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        dataset,header,documents = query_document(query, page=0, perpage=1000)
-        partial = len(documents)==1000
+        dataset,header,documents = query_document(query, page=0, perpage=PERPAGE)
+        partial = len(documents)==PERPAGE
         self.render( "document.html", q=q, dataset=dataset, header=header, documents=documents, partial=partial)
 class document_page( BaseHandler ):
     def get( self, p, q ):
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        dataset,header,documents = query_document(query, page=int(p), perpage=1000)
-        partial = len(documents)==1000
+        dataset,header,documents = query_document(query, page=int(p), perpage=PERPAGE)
+        partial = len(documents)==PERPAGE
         self.render( "document_page.html", q=q, dataset=dataset, header=header, documents=documents, partial=partial)
 
 class download( BaseHandler ):

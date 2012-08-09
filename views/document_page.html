@@ -1,7 +1,11 @@
 {% for d in documents %}
 <tr>
   {% for row in d %}
-    <td><a href="{{ request.path+row.url }}">{{ row.text }}</a></td>
+    {% if request.path.startswith("/d/") %}
+      <td><a href="{{ request.path+row.url }}">{{ row.text }}</a></td>
+    {% else %}
+      <td><a href="{{ "/d/"+request.path.split('/',3)[3]+row.url }}">{{ row.text }}</a></td>
+    {% end %}
   {% end %}
 </tr>
 {% end %}

@@ -1,5 +1,32 @@
 {% extends "base.html" %}
 
+{% block head_tail %}
+<script type="text/javascript">
+  var p = 0;
+  var busy = false;
+  setInterval(function() {
+    var d = document.getElementById("d");
+    var bottom = (window.innerHeight + window.scrollY + 10000) >= document.body.offsetHeight;
+    if( bottom && d.className.match(/partial$/g) ) {
+      p += 1; busy = true;
+      var url = window.location.pathname.replace('/d/','/p/'+p+'/');
+      xmlhttp=new XMLHttpRequest();
+      xmlhttp.open("GET",url,true);
+      xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState==4 && xmlhttp.status==200) {
+          d.innerHTML += xmlhttp.responseText;
+          if( xmlhttp.responseText.match(/^[ \t\n]*$/g) ) {
+            d.className = d.className.replace('partial','');
+          }
+          busy = false;
+        }
+      };
+      xmlhttp.send();
+    }
+  }, 1000);
+</script>
+{% end %}
+
 {% block content %}
   {% include "_header.html" %}
   <section>
@@ -17,7 +44,7 @@
     <b><a href="/download/{{ q }}">download as csv</a></b>
   </section>
 
-  <table class="document result{% if partial %} partial{% end %}">
+  <table id="d" class="document result{% if partial %} partial{% end %}">
     <tr>
       {% for row in header %}
         <th><a href="{{ request.path+row.url }}">{{ row.text }}</a></th>
