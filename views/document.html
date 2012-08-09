@@ -23,13 +23,7 @@
         <th><a href="{{ request.path+row.url }}">{{ row.text }}</a></th>
       {% end %}
     </tr>
-    {% for d in documents %}
-    <tr>
-      {% for row in d %}
-        <td><a href="{{ request.path+row.url }}">{{ row.text }}</a></td>
-      {% end %}
-    </tr>
-    {% end %}
+    {% include "document_page.html" %}
   </table>
   {% include "_related.html" %}
   {% include "_footer.html" %}

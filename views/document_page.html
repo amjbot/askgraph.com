@@ -1,0 +1,7 @@
+{% for d in documents %}
+<tr>
+  {% for row in d %}
+    <td><a href="{{ request.path+row.url }}">{{ row.text }}</a></td>
+  {% end %}
+</tr>
+{% end %}

@@ -14,13 +14,14 @@ settings = dict(
 )
 
 application = tornado.web.Application( [
-    ( "^/",                      controllers.index        ),
-    ( "^/privacy",               controllers.privacy      ),
-    ( "^/upload",                controllers.upload       ),
-    ( "^/authenticate",          controllers.authenticate ),
-    ( "^/signout",               controllers.signout      ),
-    ( "^/d/(?P<q>.+)",           controllers.document     ),
-    ( "^/download/(?P<q>.+)",    controllers.download     ),
+    ( "^/",                          controllers.index         ),
+    ( "^/privacy",                   controllers.privacy       ),
+    ( "^/upload",                    controllers.upload        ),
+    ( "^/authenticate",              controllers.authenticate  ),
+    ( "^/signout",                   controllers.signout       ),
+    ( "^/d/(?P<q>.+)",               controllers.document      ),
+    ( "^/p/(?P<p>[0-9]+)/(?P<q>.+)", controllers.document_page ),
+    ( "^/download/(?P<q>.+)",        controllers.download      ),
 ], **settings )
 
 
