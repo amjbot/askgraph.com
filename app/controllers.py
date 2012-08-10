@@ -12,17 +12,20 @@ db = tornado.database.Connection(host="localhost",user="root",database="root",pa
 
 def dbrow_to_dataset( row ):
     dataset = row['dataset']
-    return tornado.database.Row({"text":dataset , "url":"/d/"+dataset})
-def dbrow_to_tablerow( row ):
-    output = []
-    dataset = row['dataset']
-    for key,value in sorted(row.items()):
-        if not (key.startswith("key") or key.startswith("val")) or value=='':
-            continue
-        url = ("/"+key+"/") \
-            + urllib.quote(value if (isinstance(value,str) or isinstance(value,unicode)) else repr(value))
-        output.append(tornado.database.Row({"text": value, "url":url}))
-    return output
+    return tornado.database.Row({"key":dataset , "val":dataset})
+def dbrow_to_tablerow( header ):
+    def inner( row ):
+        output = []
+        dataset = row['dataset']
+        for key,val in sorted(row.items()):
+            if (not key.startswith("col")) or val=="":
+                continue
+            key = header[key]
+            key = key if (isinstance(key,str) or isinstance(key,unicode)) else repr(key)
+            val = val if (isinstance(val,str) or isinstance(val,unicode)) else repr(val)
+            output.append(tornado.database.Row({"key": key, "val":val}))
+        return output
+    return inner
 def csv_repr( v ):
     if not (isinstance(v,str) or isinstance(v,unicode)):
         return repr(v)
@@ -89,13 +92,13 @@ class upload( BaseHandler ):
             db.execute("DELETE FROM document_headers WHERE dataset=%s", dataset)
             db.execute("DELETE FROM documents WHERE dataset=%s", dataset)
             db.execute("INSERT document_headers(dataset," + \
-                       ",".join( ("key"+str(i)) for i in range(len(headers)) ) + \
+                       ",".join( ("col"+str(i)) for i in range(len(headers)) ) + \
                        ") VALUES(" + \
                        ",".join( "%s" for i in range(len(headers)+1) ) + \
                        ")", dataset, *headers)
             for d in documents:
                 db.execute("INSERT documents(dataset," + \
-                           ",".join( ("val"+str(i)) for i in range(len(headers)) ) + \
+                           ",".join( ("col"+str(i)) for i in range(len(headers)) ) + \
                            ") VALUES (" + \
                            ",".join( "%s" for i in range(len(headers)+1) ) + \
                            ")", dataset, *d)
@@ -135,14 +138,15 @@ def query_document( doc, page=0, perpage=999999 ):
             columns[key] = val
     header = db.get("SELECT * FROM document_headers WHERE dataset=%s", dataset)
     header = dict((k,v) for (k,v) in header.items() if (len(rows)==0 or k=='dataset' or k in rows))
-    documents = db.query("SELECT * FROM documents WHERE dataset=%s limit %s,%s", dataset, page*perpage, (page+1)*perpage)
+    documents = db.query("SELECT * FROM documents WHERE dataset=%s", dataset)
     documents = [
-        dict( (k,v) for (k,v) in d.items() if (len(rows)==0 or k=='dataset' or k.replace('val','key') in rows) )
+        dict( (k,v) for (k,v) in d.items() if (len(rows)==0 or k=='dataset' or k in rows) )
         for d in documents if all(d.get(k)==v for (k,v) in columns.items())
     ]
-    header = dbrow_to_tablerow(header)
-    documents = map(dbrow_to_tablerow,documents)
-    return dataset,header,documents
+    documents = documents[page*perpage:(page+1)*perpage]
+    header_as_row = dbrow_to_tablerow(header)(header)
+    documents = map(dbrow_to_tablerow(header),documents)
+    return dataset,header_as_row,documents
 
 PERPAGE = 300
 class document( BaseHandler ):

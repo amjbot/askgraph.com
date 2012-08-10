@@ -1,10 +1,11 @@
+{% import urllib %}
 {% for d in documents %}
 <tr>
   {% for row in d %}
     {% if request.path.startswith("/d/") %}
-      <td><a href="{{ request.path+row.url }}">{{ row.text }}</a></td>
+      <td><a href="{{ request.path+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td>
     {% else %}
-      <td><a href="{{ "/d/"+request.path.split('/',3)[3]+row.url }}">{{ row.text }}</a></td>
+      <td><a href="{{ "/d/"+request.path.split('/',3)[3]+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td>
     {% end %}
   {% end %}
 </tr>

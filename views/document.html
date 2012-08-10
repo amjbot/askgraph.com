@@ -32,14 +32,11 @@
   {% include "_header.html" %}
   <section>
     {% set q_dataset = q.split("/")[0] %}
-    {% set q_query = q.split("/")[1:] %}
     {% set q_url = "/d/" + q_dataset %}
     <b><a href="{{ q_url }}">{{ q_dataset }}</a></b> &nbsp;&nbsp;&gt;&nbsp;&nbsp;
-    {% while q_query != [] %}
-      {% set q_keyval = q_query[:2] %}
-      {% set q_query = q_query[2:] %}
-      {% set q_url = q_url + "/" + "/".join(q_keyval) %}
-      <b><a href="{{ q_url }}">{{ ": ".join(q_keyval) }}</a></b>
+    {% for q_part in q.split("/")[1:] %}
+      {% set q_url = q_url + "/" + q_part %}
+      <b><a href="{{ q_url }}">{{ q_part }}</a></b>
       &nbsp;&nbsp;&gt;&nbsp;&nbsp;
     {% end %}
     <b><a href="/download/{{ q }}">download as csv</a></b>
@@ -48,7 +45,7 @@
   <table id="d" class="document result{% if partial %} partial{% end %}">
     <tr>
       {% for row in header %}
-        <th><a href="{{ request.path+row.url }}">{{ row.text }}</a></th>
+        <th><a href="{{ request.path+"/"+row.key }}">{{ row.val }}</a></th>
       {% end %}
     </tr>
     {% include "document_page.html" %}
