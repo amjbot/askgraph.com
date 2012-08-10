@@ -7,6 +7,7 @@ import random
 import string
 import logging
 import sys
+import simplejson as json
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
@@ -125,25 +126,33 @@ def query_document( doc, page=0, perpage=999999 ):
     dataset = doc[0]
     query = doc[1:]
     rows = {}
-    columns = {}
-    while len(query)>0:
-        key = query.pop(0)
-        try:
-            val = query.pop(0)
-        except IndexError:
-            val = None
-        if key.startswith('key'):
-            rows[key] = val
+    columns = set()
+    for q in query:
+        if ':' in q:
+            k,v = q.split(':',1)
+            rows[k] = v
         else:
-            columns[key] = val
+            columns.add(q)
     header = db.get("SELECT * FROM document_headers WHERE dataset=%s", dataset)
-    header = dict((k,v) for (k,v) in header.items() if (len(rows)==0 or k=='dataset' or k in rows))
-    documents = db.query("SELECT * FROM documents WHERE dataset=%s", dataset)
+    rheader = dict((v,k) for (k,v) in header.items())
+    columns = set(rheader[k] for k in columns)
+    documents_query = "SELECT * FROM documents WHERE dataset=%s"\
+       + ("" if len(rows)==0 else " AND ")\
+       + " AND ".join( rheader[k]+"="+repr(v) for (k,v) in rows.items() if k in rheader )\
+       + " LIMIT %s,%s"
+    print >> sys.stderr, documents_query
+    documents = db.query("SELECT * FROM documents WHERE dataset=%s"\
+       + ("" if len(rows)==0 else " AND ")\
+       + " AND ".join( rheader[k]+"="+json.dumps(v) for (k,v) in rows.items() if k in rheader )\
+       + " LIMIT %s,%s"
+       , dataset, page*perpage, (page+1)*perpage)
+    print >> sys.stderr, "COLUMNS: "+repr(columns)
+    print >> sys.stderr, "HEADER: "+repr(header)
+    header = dict((k,v) for (k,v) in header.items() if (len(columns)==0 or k=='dataset' or k in columns))
     documents = [
-        dict( (k,v) for (k,v) in d.items() if (len(rows)==0 or k=='dataset' or k in rows) )
-        for d in documents if all(d.get(k)==v for (k,v) in columns.items())
+        dict( (k,v) for (k,v) in d.items() if (len(columns)==0 or k=='dataset' or k in columns) )
+        for d in documents
     ]
-    documents = documents[page*perpage:(page+1)*perpage]
     header_as_row = dbrow_to_tablerow(header)(header)
     documents = map(dbrow_to_tablerow(header),documents)
     return dataset,header_as_row,documents
