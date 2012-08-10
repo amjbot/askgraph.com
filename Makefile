@@ -1,14 +1,19 @@
 SHELL=/bin/bash
 
-deploy-web:
-	sudo killall -q python || true
-	sudo nohup python main.py >> log/out.log 2>> log/err.log < /dev/null &
+restart:
+	sudo supervisorctl restart all
+
+status:
+	sudo supervisorctl status all
+
+stop:
+	sudo supervisorctl stop all
 
 reset-database:
 	mysql -u root -proot root < etc/schema.sql
 
 tail-log:
-	tail -f log/out.log
+	sudo tail -1000 /var/log/supervisor/askgraph-stdout*.log
 
 tail-err:
-	tail -f log/err.log
+	sudo tail -1000 /var/log/supervisor/askgraph-stderr*.log

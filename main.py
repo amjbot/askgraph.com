@@ -1,8 +1,11 @@
+#!/usr/bin/env python
+
 import app.controllers as controllers
 import os.path
 import tornado.web
 import tornado.httpserver
 import tornado.ioloop
+import tornado.process
 import sys
 
 settings = dict(
@@ -26,5 +29,6 @@ application = tornado.web.Application( [
 
 
 if __name__=="__main__":
+    tornado.process.fork_processes(0)
     tornado.httpserver.HTTPServer(application, xheaders=True ).listen( 80 )
     tornado.ioloop.IOLoop.instance().start()
