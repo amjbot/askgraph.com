@@ -53,6 +53,8 @@ class upload( BaseHandler ):
         self.render( "upload.html" )
     @tornado.web.authenticated
     def post( self ):
+        if self.current_user=="karmafeeder":
+            raise HTTPError(403)
         def unpack_csv( s ):
             l = []
             buffer = ''
@@ -136,18 +138,11 @@ def query_document( doc, page=0, perpage=999999 ):
     header = db.get("SELECT * FROM document_headers WHERE dataset=%s", dataset)
     rheader = dict((v,k) for (k,v) in header.items())
     columns = set(rheader[k] for k in columns)
-    documents_query = "SELECT * FROM documents WHERE dataset=%s"\
-       + ("" if len(rows)==0 else " AND ")\
-       + " AND ".join( rheader[k]+"="+repr(v) for (k,v) in rows.items() if k in rheader )\
-       + " LIMIT %s,%s"
-    print >> sys.stderr, documents_query
     documents = db.query("SELECT * FROM documents WHERE dataset=%s"\
        + ("" if len(rows)==0 else " AND ")\
        + " AND ".join( rheader[k]+"="+json.dumps(v) for (k,v) in rows.items() if k in rheader )\
        + " LIMIT %s,%s"
        , dataset, page*perpage, (page+1)*perpage)
-    print >> sys.stderr, "COLUMNS: "+repr(columns)
-    print >> sys.stderr, "HEADER: "+repr(header)
     header = dict((k,v) for (k,v) in header.items() if (len(columns)==0 or k=='dataset' or k in columns))
     documents = [
         dict( (k,v) for (k,v) in d.items() if (len(columns)==0 or k=='dataset' or k in columns) )
