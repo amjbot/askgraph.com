@@ -4,11 +4,15 @@
   {% include "_header.html" %}
   <form action="/authenticate" method="post" enctype="multipart/form-data">
      {% raw xsrf_form_html() %}
-     <input name="next" type="hidden" />
-     <label for="name">Username:</label>
-     <input id="name" name="name" type="text" />
-     <label for="pass">Password:</label>
-     <input id="pass" name="pass" type="password" />
+     <input name="next" type="hidden" value="{{next}}" />
+     <section>
+       <label for="name">Username:</label>
+       <input id="name" name="name" type="text" />
+     </section>
+     <section>
+       <label for="pass">Password:</label>
+       <input id="pass" name="pass" type="password" />
+     </section>
      <input type="submit" value="Send" />
   </form>
   {% include "_footer.html" %}

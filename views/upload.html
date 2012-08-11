@@ -4,8 +4,10 @@
   {% include "_header.html" %}
   <form action="/upload" method="post" enctype="multipart/form-data">
      {% raw xsrf_form_html() %}
-     <label for="file">Upload a file:</label>
-     <input id="file" name="file" type="file" />
+     <section>
+       <label for="file">Upload a file:</label>
+       <input id="file" name="file" type="file" />
+     </section>
      <input type="submit" value="Send" />
   </form>
   {% include "_footer.html" %}

@@ -19,7 +19,7 @@ def dbrow_to_tablerow( header ):
         output = []
         dataset = row['dataset']
         for key,val in sorted(row.items()):
-            if (not key.startswith("col")) or val=="":
+            if not key.startswith("col"):
                 continue
             key = header[key]
             key = key if (isinstance(key,str) or isinstance(key,unicode)) else repr(key)
@@ -84,21 +84,26 @@ class upload( BaseHandler ):
         if file['content_type'] != 'text/csv':
             raise HTTPError(415)
         dataset = file['filename'].split('.')[0]
+        meta = {}
         headers = []
         documents = []
-        for i,line in enumerate(file['body'].split('\n')):
-            if i==0:
+        for line in file['body'].split('\n'):
+            if ":\t" in line:
+                key,val = line.strip().split(":\t")
+                meta[key] = val
+            elif 'parse_headers' not in meta:
                 headers = unpack_csv(line)
+                meta['parse_headers'] = True
             elif line:
                 documents.append( unpack_csv(line) )
         if headers and documents:
             db.execute("DELETE FROM document_headers WHERE dataset=%s", dataset)
             db.execute("DELETE FROM documents WHERE dataset=%s", dataset)
-            db.execute("INSERT document_headers(dataset," + \
+            db.execute("INSERT document_headers(dataset,source,sourcename," + \
                        ",".join( ("col"+str(i)) for i in range(len(headers)) ) + \
                        ") VALUES(" + \
-                       ",".join( "%s" for i in range(len(headers)+1) ) + \
-                       ")", dataset, *headers)
+                       ",".join( "%s" for i in range(len(headers)+3) ) + \
+                       ")", dataset, meta.get("source",""), meta.get("sourcename",""), *headers)
             for d in documents:
                 db.execute("INSERT documents(dataset," + \
                            ",".join( ("col"+str(i)) for i in range(len(headers)) ) + \
@@ -152,14 +157,14 @@ def query_document( doc, page=0, perpage=999999 ):
        + " AND ".join( rheader[k]+"="+json.dumps(v) for (k,v) in rows.items() if k in rheader )\
        + " LIMIT %s,%s"
        , dataset, page*perpage, (page+1)*perpage)
-    header = dict((k,v) for (k,v) in header.items() if (len(columns)==0 or k=='dataset' or k in columns))
+    header = dict((k,v) for (k,v) in header.items() if (len(columns)==0 or not k.startswith('col') or k in columns))
     documents = [
-        dict( (k,v) for (k,v) in d.items() if (len(columns)==0 or k=='dataset' or k in columns) )
+        dict( (k,v) for (k,v) in d.items() if (len(columns)==0 or not k.startswith('col') or k in columns) )
         for d in documents
     ]
     header_as_row = dbrow_to_tablerow(header)(header)
     documents = map(dbrow_to_tablerow(header),documents)
-    return dataset,header_as_row,documents
+    return header,header_as_row,documents
 
 PERPAGE = 300
 class document( BaseHandler ):
@@ -167,17 +172,17 @@ class document( BaseHandler ):
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        dataset,header,documents = query_document(query, page=0, perpage=PERPAGE)
+        meta,header,documents = query_document(query, page=0, perpage=PERPAGE)
         partial = len(documents)==PERPAGE
-        self.render( "document.html", q=q, dataset=dataset, header=header, documents=documents, partial=partial)
+        self.render( "document.html", q=q, meta=meta, header=header, documents=documents, partial=partial)
 class document_page( BaseHandler ):
     def get( self, p, q ):
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        dataset,header,documents = query_document(query, page=int(p), perpage=PERPAGE)
+        meta,header,documents = query_document(query, page=int(p), perpage=PERPAGE)
         partial = len(documents)==PERPAGE
-        self.render( "document_page.html", q=q, dataset=dataset, header=header, documents=documents, partial=partial)
+        self.render( "document_page.html", q=q, meta=meta, header=header, documents=documents, partial=partial)
 
 class download( BaseHandler ):
     def get( self, q ):
