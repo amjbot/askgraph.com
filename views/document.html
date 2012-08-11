@@ -46,8 +46,9 @@
   
   <table id="d" class="document result{% if partial %} partial{% end %}">
     <tr>
+      {% import urllib %}
       {% for row in header %}
-        <th><a href="{{ request.path+"/"+row.key }}">{{ row.val }}</a></th>
+        <th><a href="{{ request.path+"/"+urllib.quote(row.key) }}">{{ row.val }}</a></th>
       {% end %}
     </tr>
     {% include "document_page.html" %}
