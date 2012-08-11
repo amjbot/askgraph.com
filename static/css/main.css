@@ -31,6 +31,7 @@ img { width: 150px; }
 .half-page input { width: 340px } 
 label { width: 120px; display: inline-block; }
 input, textarea, select {
+   width: 340px;
    margin: 7px 0;
    border: 1px solid #555;
    padding: 0.5em;
@@ -42,6 +43,7 @@ input, textarea, select {
    -webkit-box-shadow: 1px 1px 1px #fff;
    -webkit-border-radius: 0.5em;
  }
+textarea { margin: 0 0 7px; height: 300px; }
 input[type="submit"] { width: 100%; }
 
 

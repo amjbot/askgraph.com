@@ -53,8 +53,8 @@ class upload( BaseHandler ):
         self.render( "upload.html" )
     @tornado.web.authenticated
     def post( self ):
-        if self.current_user=="karmafeeder":
-            raise HTTPError(403)
+        if self.current_user!="karmafeeder":
+            raise tornado.web.HTTPError(403)
         def unpack_csv( s ):
             l = []
             buffer = ''
@@ -107,6 +107,15 @@ class upload( BaseHandler ):
                            ")", dataset, *d)
         self.redirect("/d/"+urllib.quote(dataset))
 
+
+class request( BaseHandler ):
+    def get( self ):
+        self.render("request.html")
+    def post( self ):
+        name = self.get_argument("name","")
+        request = self.get_argument("request","")
+        db.execute("INSERT requests(name,request) VALUES(%s,%s)",name,request)
+        self.redirect("/")
 
 class signout( BaseHandler ):
     def get( self ):
