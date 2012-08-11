@@ -19,7 +19,7 @@ def dbrow_to_tablerow( header ):
         output = []
         dataset = row['dataset']
         for key,val in sorted(row.items()):
-            if not key.startswith("col"):
+            if not key.startswith("col") or header[key]=="":
                 continue
             key = header[key]
             key = key if (isinstance(key,str) or isinstance(key,unicode)) else repr(key)
