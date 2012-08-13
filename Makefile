@@ -9,6 +9,12 @@ status:
 stop:
 	sudo supervisorctl stop all
 
+backup-database:
+	mysqldump root -u root -proot > .backup.sql
+
+load-database:
+	mysql -u root -proot root < .backup.sql
+
 reset-database:
 	mysql -u root -proot root < etc/schema.sql
 
