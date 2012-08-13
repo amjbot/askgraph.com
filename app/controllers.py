@@ -133,7 +133,6 @@ class authenticate( BaseHandler ):
     def post( self ):
         next = self.get_argument("next","/") or "/"
         name = self.get_argument("name")
-        password = self.get_argument("pass")
         self.set_secure_cookie("user",name)
         self.redirect(next)
 
