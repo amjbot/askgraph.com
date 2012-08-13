@@ -41,3 +41,18 @@ CREATE TABLE IF NOT EXISTS documents (
     col9 VARBINARY(200) NOT NULL DEFAULT '',
     KEY(dataset)
 );
+
+CREATE TABLE IF NOT EXISTS machine_queue (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    state ENUM('open','inprogress','completed','confirmed'),
+    route VARBINARY(200) NOT NULL DEFAULT '',
+    input_type VARBINARY(200) NOT NULL DEFAULT '',
+    input_data VARBINARY(2000) NOT NULL DEFAULT ''    
+);
+CREATE TABLE IF NOT EXISTS human_queue (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    state ENUM('open','inprogress','completed','confirmed'),
+    route VARBINARY(200) NOT NULL DEFAULT '',
+    input_type VARBINARY(200) NOT NULL DEFAULT '',
+    input_data VARBINARY(2000) NOT NULL DEFAULT ''    
+);
