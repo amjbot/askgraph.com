@@ -42,16 +42,9 @@ CREATE TABLE IF NOT EXISTS documents (
     KEY(dataset)
 );
 
-CREATE TABLE IF NOT EXISTS machine_queue (
+CREATE TABLE IF NOT EXISTS queue (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    state ENUM('open','inprogress','completed','confirmed'),
-    route VARBINARY(200) NOT NULL DEFAULT '',
-    delay TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    argument VARBINARY(2000) NOT NULL DEFAULT ''
-);
-CREATE TABLE IF NOT EXISTS human_queue (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    state ENUM('open','inprogress','completed','confirmed'),
+    state ENUM('open','active','complete','confirmed'),
     route VARBINARY(200) NOT NULL DEFAULT '',
     delay TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     argument VARBINARY(2000) NOT NULL DEFAULT ''
