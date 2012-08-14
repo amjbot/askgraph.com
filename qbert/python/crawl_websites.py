@@ -1,6 +1,6 @@
 import noisebot
 
-noisebot.crawl()
+i = noisebot.crawl()
 
 qbert.insert()
-print "crawled up to 100 websites"
+print "crawled %d websites" % i
