@@ -9,11 +9,12 @@ status:
 stop:
 	sudo supervisorctl stop all
 
-backup-database:
-	mysqldump root -u root -proot > .backup.sql
-
-load-database:
+restore-database:
+	./scripts/download_s3.py backups/daily.sql.tar.gz
+	tar -xzf daily.sql.tar.gz
 	mysql -u root -proot root < .backup.sql
+	rm daily.sql.tar.gz
+	rm .backup.sql
 
 reset-database:
 	mysql -u root -proot root < etc/schema.sql

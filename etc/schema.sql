@@ -45,11 +45,8 @@ CREATE TABLE IF NOT EXISTS documents (
     KEY(dataset)
 );
 
-DROP TABLE IF EXISTS queue;
-CREATE TABLE IF NOT EXISTS queue (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    state ENUM('open','active','complete','confirmed'),
-    route VARBINARY(200) NOT NULL DEFAULT '',
-    delay TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    argument VARBINARY(2000) NOT NULL DEFAULT ''
+DROP TABLE IF EXISTS link_firehose;
+CREATE TABLE IF NOT EXISTS link_firehose (
+    id INT NOT NULL PRIMARY KEY,
+    state ENUM('open','active','complete','confirmed') default 'open'
 );
