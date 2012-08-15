@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import boto
 import subprocess
 import os
@@ -27,5 +29,5 @@ if time.gmtime().tm_mday == 2:
 os.remove(".backup.sql")
 os.remove("backup.sql.tar.gz")
 
-qbert.insert( delay=60*60*24 )
-print "created backup of database"
+import syslog
+syslog.syslog(syslog.LOG_INFO,"created backup of database")
