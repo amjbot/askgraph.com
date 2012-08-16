@@ -47,70 +47,6 @@ class privacy( BaseHandler ):
     def get( self ):
         self.render( "privacy.html" )
 
-class upload( BaseHandler ):
-    @tornado.web.authenticated
-    def get( self ):
-        self.render( "upload.html" )
-    @tornado.web.authenticated
-    def post( self ):
-        if self.current_user!="karmafeeder":
-            raise tornado.web.HTTPError(403)
-        def unpack_csv( s ):
-            l = []
-            buffer = ''
-            escape = False
-            string_close = ''
-            for c in s:
-                if string_close==c:
-                    string_close = ''
-                elif string_close:
-                    buffer += c
-                elif c=='\\':
-                    escape = True
-                elif escape:
-                    buffer += c
-                    escape = False
-                elif c=='"':
-                    string_close = '"'
-                elif c==',':
-                    l.append( buffer )
-                    buffer = ''
-                else:
-                    buffer += c
-            if buffer:
-                l.append( buffer.strip() )
-            return l
-        file = self.request.files['file'][0]
-        if file['content_type'] != 'text/csv':
-            raise HTTPError(415)
-        dataset = file['filename'].split('.')[0]
-        meta = {}
-        headers = []
-        documents = []
-        for line in file['body'].split('\n'):
-            if ":\t" in line:
-                key,val = line.strip().split(":\t")
-                meta[key] = val
-            elif 'parse_headers' not in meta:
-                headers = unpack_csv(line)
-                meta['parse_headers'] = True
-            elif line:
-                documents.append( unpack_csv(line) )
-        if headers and documents:
-            db.execute("DELETE FROM document_headers WHERE dataset=%s", dataset)
-            db.execute("DELETE FROM documents WHERE dataset=%s", dataset)
-            db.execute("INSERT document_headers(dataset,source,sourcename," + \
-                       ",".join( ("col"+str(i)) for i in range(len(headers)) ) + \
-                       ") VALUES(" + \
-                       ",".join( "%s" for i in range(len(headers)+3) ) + \
-                       ")", dataset, meta.get("source",""), meta.get("sourcename",""), *headers)
-            for d in documents:
-                db.execute("INSERT documents(dataset," + \
-                           ",".join( ("col"+str(i)) for i in range(len(headers)) ) + \
-                           ") VALUES (" + \
-                           ",".join( "%s" for i in range(len(headers)+1) ) + \
-                           ")", dataset, *d)
-        self.redirect("/d/"+urllib.quote(dataset))
 
 
 class request( BaseHandler ):
@@ -121,20 +57,6 @@ class request( BaseHandler ):
         request = self.get_argument("request","")
         db.execute("INSERT requests(name,request) VALUES(%s,%s)",name,request)
         self.redirect("/")
-
-class signout( BaseHandler ):
-    def get( self ):
-        self.clear_cookie("user")
-        self.redirect( self.request.headers.get('Referer','/') )
-class authenticate( BaseHandler ):
-    def get( self ):
-        next = self.get_argument("next","/")
-        self.render( "authenticate.html", next=next )
-    def post( self ):
-        next = self.get_argument("next","/") or "/"
-        name = self.get_argument("name")
-        self.set_secure_cookie("user",name)
-        self.redirect(next)
 
 
 def query_document( doc, page=0, perpage=999999 ):

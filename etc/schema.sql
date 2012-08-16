@@ -45,8 +45,4 @@ CREATE TABLE IF NOT EXISTS documents (
     KEY(dataset)
 );
 
-DROP TABLE IF EXISTS link_firehose;
-CREATE TABLE IF NOT EXISTS link_firehose (
-    id INT NOT NULL PRIMARY KEY,
-    state ENUM('open','active','complete','confirmed') default 'open'
-);
+

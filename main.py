@@ -12,17 +12,13 @@ settings = dict(
    cookie_secret  =  "34qw4x65cdf7vgy7buhnijmk9xrcdtfvyugbihn",
    static_path    = os.path.join(os.path.dirname(__file__), "static"),
    template_path  = os.path.join(os.path.dirname(__file__), "views"),
-   xsrf_cookies   = True,
-   login_url      = "/authenticate",
+   xsrf_cookies   = True
 )
 
 application = tornado.web.Application( [
     ( "^/",                          controllers.index         ),
     ( "^/privacy",                   controllers.privacy       ),
     ( "^/request",                   controllers.request       ),
-    ( "^/upload",                    controllers.upload        ),
-    ( "^/authenticate",              controllers.authenticate  ),
-    ( "^/signout",                   controllers.signout       ),
     ( "^/d/(?P<q>.+)",               controllers.document      ),
     ( "^/p/(?P<p>[0-9]+)/(?P<q>.+)", controllers.document_page ),
     ( "^/download/(?P<q>.+)",        controllers.download      ),
