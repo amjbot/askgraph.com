@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Askgraph.com - Silent Work{% end %}
+
+{% block content %}
+  {% include "_header.html" %}
+  <h2>{% apply linkify %}{{ link }}{% end %}</h2>
+
+  {#
+  <form action="/request" method="post">
+     {% raw xsrf_form_html() %}
+     <section>
+       <label for="name">Your name:</label>
+       <input id="name" name="name" type="text"/>
+     </section>
+     <section>
+       <label for="request">Your request:</label>
+       <textarea id="request" name="request"></textarea>
+     </section>
+     <section>
+       <input type="submit" value="Send" title="Submit your request"/>
+     </section>
+  </form>
+  #}
+  {% include "_footer.html" %}
+{% end %}

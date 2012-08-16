@@ -23,6 +23,7 @@ application = tornado.web.Application( [
     ( "^/p/(?P<p>[0-9]+)/(?P<q>.+)", controllers.document_page ),
     ( "^/download/(?P<q>.+)",        controllers.download      ),
     ( "^/silent_bot_crawl",          controllers.crawl         ),
+    ( "^/silent_work",               controllers.silent_work   ),
     ( ".*",                          controllers._404          ),
 ], **settings )
 
