@@ -1,0 +1,9 @@
+{
+  "name": "Silent Bot",
+  "version": "1.0",
+  "background": { "scripts": ["background.js"] },
+  "permissions": [
+    "webRequest", "webNavigation", "tabs", "http://*/*", "https://*/*"
+  ],
+  "manifest_version": 2
+}
