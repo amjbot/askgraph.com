@@ -35,8 +35,11 @@ def csv_repr( v ):
         
 
 class BaseHandler( tornado.web.RequestHandler ):
-    def get_current_user( self ):
-        return self.get_secure_cookie("user")
+    pass
+
+class _404( BaseHandler ):
+    def get( self ):
+        self.render("404.html")
 
 class index( BaseHandler ):
     def get( self ):
@@ -58,6 +61,13 @@ class request( BaseHandler ):
         db.execute("INSERT requests(name,request) VALUES(%s,%s)",name,request)
         self.redirect("/")
 
+class crawl( BaseHandler ):
+    def check_xsrf_cookie( self ):
+        pass
+    def post( self ):
+        source = self.get_argument("source")
+        target = self.get_argument("target")
+        db.execute("INSERT arrows(source,target) VALUES(%s,%s)",source,target)
 
 def query_document( doc, page=0, perpage=999999 ):
     dataset = doc[0]

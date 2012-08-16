@@ -1,9 +1,4 @@
 {% import time %}
 <header>
   <a href="/">Page rendered at {{ time.ctime() }}</a>
-  {% if current_user %}
-  <span style="float: right">
-    <a href="/signout" title="Sign out current user">{{ current_user }}</a>
-  </span>
-  {% end %}
 </header>
