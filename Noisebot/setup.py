@@ -2,4 +2,4 @@
 
 from distutils.core import setup
 
-setup(py_modules=['noisebot'])
+setup(py_modules=['noisebot'], scripts=["noisebot.py"])
