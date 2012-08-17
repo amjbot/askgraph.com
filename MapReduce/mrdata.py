@@ -25,7 +25,8 @@ if len(argv)==3 and argv[1] == "load" and (argv[2].endswith('.csv') or argv[2].e
     elif format=="txt":
         i = -1
         for i,entry in enumerate(open(argv[2])):
-            if entry.strip()=="": continue
+            entry = entry.strip()
+            if entry=="": continue
             db.execute("INSERT mr_dataset(dataset_name,dataset_value) VALUES(%s,%s)", dataset, json.dumps({"data": entry}))
         print "Created dataset %s with %d rows" % (dataset,i+1)
     else:
