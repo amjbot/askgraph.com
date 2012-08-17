@@ -18,6 +18,8 @@ target_ContentType = {
 }
 
 def crawl( url, target=None, depth=1, noisy=False ):
+    depth = int(depth)
+    noisy = bool(noisy)
     sources = set([ url ])
     visited = set()
     matched = set()
@@ -30,6 +32,8 @@ def crawl( url, target=None, depth=1, noisy=False ):
             time.sleep(1)
             visited.add( url )
             try:
+                if noisy:
+                    print "Visit resource %s" % (url,)
                 response = http_client.fetch(url, user_agent="noisebot")
                 content_type[url] = response.headers.get('Content-Type','text/html').split(';')[0].strip()
                 if content_type[url] == 'text/html':
@@ -41,15 +45,18 @@ def crawl( url, target=None, depth=1, noisy=False ):
                         if not href.startswith("http"):
                            href = urlparse.urljoin( urlparse.urlsplit(url).geturl(), href )
                         sources.add( href )
-                        if noisy:
-                            print "Extract content from resource at %s" % (href,)
             except tornado.httpclient.HTTPError, e:
                 if noisy:
                     import traceback
-                    print "Caught exception while trying to crawl %s" % item.route
+                    print "Caught exception while trying to crawl %s" % url
+                    traceback.print_exc()
+            except Exception, e:
+                if noisy:
+                    import traceback
+                    print "Caught exception while trying to crawl %s" % url
                     traceback.print_exc()
     for url in visited:
-        if not target or content_type[url] in target_ContentType[target]:
+        if not target or content_type.get(url,None) in target_ContentType[target]:
             matched.add(url)
     return list(matched)
 

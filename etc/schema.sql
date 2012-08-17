@@ -71,6 +71,7 @@ DROP TABLE IF EXISTS mr_workflow;
 CREATE TABLE IF NOT EXISTS mr_workflow (
    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
    workflow_route VARBINARY(500) NOT NULL,
+   workflow_output VARBINARY(500) NOT NULL,
    workflow_value VARBINARY(5000) NOT NULL,
    workflow_config VARBINARY(5000) NOT NULL,
    KEY(workflow_route)
