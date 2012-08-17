@@ -11,16 +11,25 @@ import tornado.database
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
 
-if len(argv)==3 and argv[1] == "load":
-    dataset = argv[2].rsplit('.',1)[0]
+if len(argv)==3 and argv[1] == "load" and (argv[2].endswith('.csv') or argv[2].endswith('.txt')):
+    dataset = argv[2].split('/')[-1].rsplit('.',1)[0]
+    format = argv[2].rsplit('.',1)[1]
     exists = db.get("SELECT * FROM mr_dataset WHERE dataset_name=%s LIMIT 1", dataset)
     if exists:
-        print "A dataset with that name already exists"
-    else:
+        db.execute("DELETE FROM mr_dataset WHERE dataset_name=%s", dataset)
+    if format=="csv":
         i = -1
         for i,entry in enumerate(csv.DictReader(open(argv[2]))):
             db.execute("INSERT mr_dataset(dataset_name,dataset_value) VALUES(%s,%s)", dataset, json.dumps(entry))
         print "Created dataset %s with %d rows" % (dataset,i+1)
+    elif format=="txt":
+        i = -1
+        for i,entry in enumerate(open(argv[2])):
+            if entry.strip()=="": continue
+            db.execute("INSERT mr_dataset(dataset_name,dataset_value) VALUES(%s,%s)", dataset, json.dumps({"data": entry}))
+        print "Created dataset %s with %d rows" % (dataset,i+1)
+    else:
+        assert False
 
 
 elif len(argv)==3 and argv[1] == "remove":
