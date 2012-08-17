@@ -5,7 +5,9 @@
 {% block content %}
   {% include "_header.html" %}
   <h2>{% apply linkify %}{{ link }}{% end %}</h2>
-
+  {% for n in notes %}
+    <p>{{ n }}</p>
+  {% end %}
   {#
   <form action="/request" method="post">
      {% raw xsrf_form_html() %}

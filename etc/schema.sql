@@ -59,18 +59,20 @@ CREATE TABLE IF NOT EXISTS linkpool (
    object VARBINARY(500) NOT NULL UNIQUE
 );
 
-DROP TABLE IF EXISTS note_questions;
-CREATE TABLE IF NOT EXISTS note_questions (
+DROP TABLE IF EXISTS mr_dataset;
+CREATE TABLE IF NOT EXISTS mr_dataset (
    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   note_key VARBINARY(500) NOT NULL,
-   note_value VARBINARY(500) NOT NULL,
-   note_prompt VARBINARY(500) NOT NULL,
-   UNIQUE KEY(note_key,note_value)
+   dataset_name VARBINARY(500) NOT NULL,
+   dataset_value VARBINARY(5000) NOT NULL,
+   KEY(dataset_name)
 );
-DROP TABLE IF EXISTS note_answers;
-CREATE TABLE IF NOT EXISTS note_answers (
+
+DROP TABLE IF EXISTS mr_workflow;
+CREATE TABLE IF NOT EXISTS mr_workflow (
    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-   note_link VARBINARY(500) NOT NULL,
-   note_key VARBINARY(500) NOT NULL,
-   note_value VARBINARY(500) NOT NULL
+   workflow_route VARBINARY(500) NOT NULL,
+   workflow_value VARBINARY(5000) NOT NULL,
+   workflow_config VARBINARY(5000) NOT NULL,
+   KEY(workflow_route)
 );
+
