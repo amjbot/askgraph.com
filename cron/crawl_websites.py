@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 
+import daemon
+daemon.singleton("crawl_websites.pid")
+
 import noisebot
 import tornado.database
 import json
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
-
 
 i = -1
 for i,task in enumerate(db.query("SELECT * FROM mr_workflow WHERE workflow_route='crawl' ORDER BY RAND() LIMIT 1")):
@@ -20,4 +22,4 @@ for i,task in enumerate(db.query("SELECT * FROM mr_workflow WHERE workflow_route
 
 
 import syslog
-syslog.syslog( syslog.LOG_INFO, "crawled %d website" % i )
+syslog.syslog( syslog.LOG_INFO, "crawled %d website" % (i+1) )
