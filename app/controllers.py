@@ -54,21 +54,25 @@ class privacy( BaseHandler ):
 
 class silent_work( BaseHandler ):
     def get( self ):
-        route = self.get_argument("route")
-        w = db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
+        route = self.get_argument("route",None)
+        w = route and db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
+        w = w or db.get("SELECT * FROM mr_workflow ORDER BY RAND() LIMIT 1")
+        route = w and w.workflow_route
         output = w and w.workflow_output
         link = w and json.loads(w.workflow_value).get('data',None)
         form = db.get("SELECT * FROM fjorm WHERE name=%s", route)
         form = form and json.loads(form.form)
-        self.render("work.html", link=link, output=output, form=form)
+        self.render("work.html", link=link, route=route, output=output, form=form)
     def post( self ):
+        route = self.get_argument("route")
         output = self.get_argument("output")
         args = dict((k,v[0]) for (k,v) in self.request.arguments.items())
         del args['_xsrf']
+        del args['route']
         del args['output']
         value = fjorm.parse_response( args )
         db.execute("INSERT mr_dataset(dataset_name,dataset_value) VALUES(%s,%s)", output, json.dumps(value))
-
+        self.redirect("/silent_work?route="+tornado.escape.url_escape(route))
 
 class request( BaseHandler ):
     def get( self ):
