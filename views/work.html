@@ -9,7 +9,9 @@
     <h2>{% apply linkify %}{{ link }}{% end %}</h2>
     <form action="/silent_work" method="post">
       {% raw xsrf_form_html() %}
+      <input type="hidden" name="output" value="{{ output }}"/>
       {% raw fjorm.generate_html(form) %}
+      <input type="submit" value="Submit"/>
     </form>
   {% else %}
     <p>The work queue is empty. Good work.</p>

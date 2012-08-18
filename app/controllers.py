@@ -8,6 +8,7 @@ import string
 import logging
 import sys
 import simplejson as json
+import fjorm
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
@@ -54,16 +55,20 @@ class privacy( BaseHandler ):
 class silent_work( BaseHandler ):
     def get( self ):
         route = self.get_argument("route")
-        link = db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
-        link = link and json.loads(link.workflow_value).get('data',None)
+        w = db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
+        output = w and w.workflow_output
+        link = w and json.loads(w.workflow_value).get('data',None)
         form = db.get("SELECT * FROM fjorm WHERE name=%s", route)
         form = form and json.loads(form.form)
-        self.render("work.html", link=link, form=form)
+        self.render("work.html", link=link, output=output, form=form)
     def post( self ):
-        link = self.get_argument("link")
-        key = self.get_argument("key")
-        value = self.get_argument("value")
-        db.execute("INSERT (note_link,note_key,note_value) VALUES(%s,%s,%s)", link, key, value)
+        output = self.get_argument("output")
+        args = dict((k,v[0]) for (k,v) in self.request.arguments.items())
+        del args['_xsrf']
+        del args['output']
+        value = fjorm.parse_response( args )
+        db.execute("INSERT mr_dataset(dataset_name,dataset_value) VALUES(%s,%s)", output, json.dumps(value))
+
 
 class request( BaseHandler ):
     def get( self ):

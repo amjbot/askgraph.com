@@ -20,4 +20,4 @@ def generate_html( intent, prefix="" ):
     )
 
 def parse_response( d ):
-    pass
+    return d
