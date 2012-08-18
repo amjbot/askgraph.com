@@ -55,6 +55,7 @@ class silent_work( BaseHandler ):
     def get( self ):
         route = self.get_argument("route")
         link = db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
+        link = link and json.loads(link.workflow_value).get('data',None)
         form = db.get("SELECT * FROM fjorm WHERE name=%s", route)
         form = form and json.loads(form.form)
         self.render("work.html", link=link, form=form)
