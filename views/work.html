@@ -4,25 +4,15 @@
 
 {% block content %}
   {% include "_header.html" %}
-  <h2>{% apply linkify %}{{ link }}{% end %}</h2>
-  {% for n in notes %}
-    <p>{{ n }}</p>
+  {% if link and form %}
+    {% import fjorm %}
+    <h2>{% apply linkify %}{{ link }}{% end %}</h2>
+    <form action="/silent_work" method="post">
+      {% raw xsrf_form_html() %}
+      {% raw fjorm.render_html(form) %}
+    </form>
+  {% else %}
+    <p>The work queue is empty. Good work.</p>
   {% end %}
-  {#
-  <form action="/request" method="post">
-     {% raw xsrf_form_html() %}
-     <section>
-       <label for="name">Your name:</label>
-       <input id="name" name="name" type="text"/>
-     </section>
-     <section>
-       <label for="request">Your request:</label>
-       <textarea id="request" name="request"></textarea>
-     </section>
-     <section>
-       <input type="submit" value="Send" title="Submit your request"/>
-     </section>
-  </form>
-  #}
   {% include "_footer.html" %}
 {% end %}

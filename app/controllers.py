@@ -53,17 +53,11 @@ class privacy( BaseHandler ):
 
 class silent_work( BaseHandler ):
     def get( self ):
-        link = self.get_argument("link",None)
-        if not link:
-            link = db.get("SELECT * FROM linkpool ORDER BY RAND() LIMIT 1")
-            link = link and link["object"]
-        notes = db.query("SELECT * FROM note_answers,note_questions WHERE " +
-                         "note_answers.note_key=note_questions.note_key AND " +
-                         "note_answers.note_value=note_questions.note_value AND " +
-                         "note_link=%s", link)
-        if len(notes)==0:
-            notes = db.query("SELECT * FROM note_questions WHERE note_key='' AND note_value=''")
-        self.render("work.html", link=link, notes=notes)
+        route = self.get_argument("route")
+        link = db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
+        form = db.get("SELECT * FROM fjorm WHERE name=%s", route)
+        form = form and json.loads(form.form)
+        self.render("work.html", link=link, form=form)
     def post( self ):
         link = self.get_argument("link")
         key = self.get_argument("key")
