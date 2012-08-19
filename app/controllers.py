@@ -57,21 +57,25 @@ class silent_work( BaseHandler ):
         route = self.get_argument("route",None)
         w = route and db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
         w = w or db.get("SELECT * FROM mr_workflow ORDER BY RAND() LIMIT 1")
+        workflow_id = w and w.id
         route = w and w.workflow_route
         output = w and w.workflow_output
         link = w and json.loads(w.workflow_value).get('data',None)
         form = db.get("SELECT * FROM fjorm WHERE name=%s", route)
         form = form and json.loads(form.form)
-        self.render("work.html", link=link, route=route, output=output, form=form)
+        self.render("work.html", link=link, workflow_id=workflow_id, route=route, output=output, form=form)
     def post( self ):
         route = self.get_argument("route")
         output = self.get_argument("output")
+        workflow_id = self.get_argument("workflow_id")
         args = dict((k,v[0]) for (k,v) in self.request.arguments.items())
         del args['_xsrf']
+        del args['workflow_id']
         del args['route']
         del args['output']
         value = fjorm.parse_response( args )
         db.execute("INSERT mr_dataset(dataset_name,dataset_value) VALUES(%s,%s)", output, json.dumps(value))
+        db.execute("DELETE FROM mr_workflow WHERE id=%s", workflow_id)
         self.redirect("/silent_work?route="+tornado.escape.url_escape(route))
 
 class request( BaseHandler ):

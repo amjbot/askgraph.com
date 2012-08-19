@@ -33,7 +33,7 @@ if len(argv)==3 and argv[1] == "load" and (argv[2].endswith('.csv') or argv[2].e
         assert False
 
 
-elif len(argv)==3 and argv[1] == "remove":
+elif len(argv)==3 and argv[1] == "clear":
     count = db.get("SELECT count(*) FROM mr_dataset WHERE dataset_name=%s", argv[2])['count(*)']
     db.execute("DELETE FROM mr_dataset WHERE dataset_name=%s", argv[2])
     print "Removed %s dataset with %d rows" % (argv[2], count or 0)
@@ -67,7 +67,7 @@ else:
     print "   list - list available datasets"
     print "   load - load a new dataset from csv"
     print "   show - show a dataset in csv format"
-    print "   remove - remove a dataset from the database"
+    print "   clear - remove a dataset from the database"
     print "   move - move a dataset to a new location"
     print "   copy - copy a dataset to a new location"
     print "   describe - describe the structure of a dataset"
