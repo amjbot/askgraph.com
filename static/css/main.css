@@ -99,6 +99,6 @@ table.document tr td {
     background: #fafafa;
 }
 table.document a { text-decoration: none; }
-table.document th a { display: inline-block; padding: 21px 25px 22px 25px; }
-table.document td a { display: inline-block; padding: 18px; }
+table.document th { padding: 21px 25px 22px 25px; }
+table.document td { padding: 18px; }
 

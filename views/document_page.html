@@ -5,9 +5,11 @@
     {% if linkify(row.val) != row.val %}
       <td>{% apply linkify %}{{ row.val }}{% end %}</td>
     {% elif request.path.startswith("/d/") %}
-      <td><a href="{{ request.path+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td>
+      <td>{{ row.val }}</td>
+      {# <td><a href="{{ request.path+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td> #}
     {% else %}
-      <td><a href="{{ "/d/"+request.path.split('/',3)[3]+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td>
+      <td>{{ row.val }}</td>
+      {# <td><a href="{{ "/d/"+request.path.split('/',3)[3]+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td> #}
     {% end %}
   {% end %}
 </tr>
