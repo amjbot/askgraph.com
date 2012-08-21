@@ -1,3 +1,4 @@
 * * * * * /home/ubuntu/askgraph.com/cron/crawl_websites.py
 0 0 * * * /home/ubuntu/askgraph.com/cron/backup_database.py
 0 * * * * /home/ubuntu/askgraph.com/cron/migrate_information.py
+0 * * * * mrdata.py unique

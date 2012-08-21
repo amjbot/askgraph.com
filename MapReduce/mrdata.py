@@ -48,6 +48,10 @@ elif len(argv)==2 and argv[1] == "list":
     for entry in db.query("SELECT * FROM mr_dataset GROUP BY dataset_name"):
         print entry["dataset_name"]
 
+elif len(argv)==2 and argv[1] == "unique":
+    for entry in db.query("SELECT *,count(*) FROM mr_dataset GROUP BY dataset_name,dataset_value HAVING count(*)>1"):
+        db.execute("DELETE FROM mr_dataset WHERE dataset_name=%s and dataset_value=%s and id<>%s",
+            entry.dataset_name, entry.dataset_value, entry.id)
 
 elif len(argv)==4 and argv[1] == "move":
     count = db.get("SELECT count(*) FROM mr_dataset WHERE dataset_name=%s", argv[2])['count(*)']

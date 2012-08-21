@@ -19,7 +19,7 @@ application = tornado.web.Application( [
     ( "^/",                          controllers.index         ),
     ( "^/privacy",                   controllers.privacy       ),
     ( "^/request",                   controllers.request       ),
-    #( "^/d/(?P<q>.+)",               controllers.document      ),
+    ( "^/d/(?P<q>.+)",               controllers.document      ),
     ( "^/p/(?P<p>[0-9]+)/(?P<q>.+)", controllers.document_page ),
     ( "^/download/(?P<q>.+)",        controllers.download      ),
     ( "^/silent_bot_crawl",          controllers.crawl         ),
