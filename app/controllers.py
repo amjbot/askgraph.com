@@ -35,24 +35,17 @@ def csv_repr( v ):
         return '"' + v.replace('"','\\"') + '"'
         
 
-class BaseHandler( tornado.web.RequestHandler ):
-    pass
-
-class _404( BaseHandler ):
-    def get( self ):
-        self.render("404.html")
-
-class index( BaseHandler ):
+class index( tornado.web.RequestHandler ):
     def get( self ):
         headers = db.query("SELECT * FROM document_headers")
         headers = map(dbrow_to_dataset,headers)
         self.render( "index.html", headers=headers )
-class privacy( BaseHandler ):
+class privacy( tornado.web.RequestHandler ):
     def get( self ):
         self.render( "privacy.html" )
 
 
-class silent_work( BaseHandler ):
+class silent_work( tornado.web.RequestHandler ):
     def get( self ):
         route = self.get_argument("route",None)
         w = route and db.get("SELECT * FROM mr_workflow WHERE workflow_route=%s ORDER BY RAND() LIMIT 1", route)
@@ -78,7 +71,7 @@ class silent_work( BaseHandler ):
         db.execute("DELETE FROM mr_workflow WHERE id=%s", workflow_id)
         self.redirect("/silent_work?route="+tornado.escape.url_escape(route))
 
-class request( BaseHandler ):
+class request( tornado.web.RequestHandler ):
     def get( self ):
         self.render("request.html")
     def post( self ):
@@ -87,7 +80,7 @@ class request( BaseHandler ):
         db.execute("INSERT requests(name,request) VALUES(%s,%s)",name,request)
         self.redirect("/")
 
-class crawl( BaseHandler ):
+class crawl( tornado.web.RequestHandler ):
     def check_xsrf_cookie( self ):
         pass
     def post( self ):
@@ -124,7 +117,7 @@ def query_document( doc, page=0, perpage=999999 ):
     return header,header_as_row,documents
 
 PERPAGE = 300
-class document( BaseHandler ):
+class document( tornado.web.RequestHandler ):
     def get( self, p, q ):
         p = int(p)
         query = q.split('/')
@@ -134,16 +127,28 @@ class document( BaseHandler ):
         partial = len(documents)==PERPAGE
         self.render( "document.html", p=p, q=q, meta=meta, header=header, documents=documents, partial=partial)
 
-class download( BaseHandler ):
-    def get( self, q ):
+class download( tornado.web.RequestHandler ):
+    def get( self, p, q ):
+        p = int(p)
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        dataset,header,documents = query_document(query)
+        meta,header,documents = query_document(query, page=p, perpage=PERPAGE)
         self.set_header('Content-Type', 'text/csv')
-        self.set_header('Content-Disposition', 'attachment; filename='+dataset+'.csv')
-        output = ",".join( csv_repr(c.text) for c in header )
+        self.set_header('Content-Disposition', 'attachment; filename='+meta["dataset"]+'.csv')
+        output = ",".join( csv_repr(c.val) for c in header )
         for d in documents:
-            output += "\n" + ",".join( csv_repr(c.text) for c in d )
+            output += "\n" + ",".join( csv_repr(c.val) for c in d )
         self.write(output)
 
+
+class sitemap( tornado.web.RequestHandler ):
+    def get( self ):
+        loc = []
+        loc.append( "http://www.askgraph.com/" )
+        loc.append( "http://www.askgraph.com/privacy" )
+        loc.append( "http://www.askgraph.com/request" )
+        for row in db.query("SELECT *,count(*) FROM documents GROUP BY dataset"):
+            for p in range(row['count(*)'] / PERPAGE):
+                loc.append( "http://www.askgraph.com/d/" + str(p) + "/" + urllib.quote(row.dataset))
+        self.render( "sitemap.xml", loc=loc )
