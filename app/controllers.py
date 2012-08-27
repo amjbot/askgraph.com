@@ -113,7 +113,7 @@ def query_document( doc, page=0, perpage=999999 ):
        + ("" if len(rows)==0 else " AND ")\
        + " AND ".join( rheader[k]+"="+json.dumps(v) for (k,v) in rows.items() if k in rheader )\
        + " LIMIT %s,%s"
-       , dataset, page*perpage, (page+1)*perpage)
+       , dataset, page*perpage, perpage)
     header = dict((k,v) for (k,v) in header.items() if (len(columns)==0 or not k.startswith('col') or k in columns))
     documents = [
         dict( (k,v) for (k,v) in d.items() if (len(columns)==0 or not k.startswith('col') or k in columns) )
@@ -125,21 +125,14 @@ def query_document( doc, page=0, perpage=999999 ):
 
 PERPAGE = 300
 class document( BaseHandler ):
-    def get( self, q ):
-        query = q.split('/')
-        if len(query) < 1:
-            raise tornado.web.HTTPError(400)
-        meta,header,documents = query_document(query, page=0, perpage=PERPAGE)
-        partial = len(documents)==PERPAGE
-        self.render( "document.html", q=q, meta=meta, header=header, documents=documents, partial=partial)
-class document_page( BaseHandler ):
     def get( self, p, q ):
+        p = int(p)
         query = q.split('/')
         if len(query) < 1:
             raise tornado.web.HTTPError(400)
-        meta,header,documents = query_document(query, page=int(p), perpage=PERPAGE)
+        meta,header,documents = query_document(query, page=p, perpage=PERPAGE)
         partial = len(documents)==PERPAGE
-        self.render( "document_page.html", q=q, meta=meta, header=header, documents=documents, partial=partial)
+        self.render( "document.html", p=p, q=q, meta=meta, header=header, documents=documents, partial=partial)
 
 class download( BaseHandler ):
     def get( self, q ):

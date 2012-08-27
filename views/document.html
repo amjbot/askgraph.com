@@ -1,32 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Askgraph.com - {{ meta['dataset'] }}{% end %}
 
-{% block head_tail %}
-<script type="text/javascript">
-  var p = 0;
-  setInterval(function() {
-    var d = document.getElementById("d");
-    var bottom = (window.innerHeight + window.scrollY + 10000) >= document.body.offsetHeight;
-    if( bottom && d.className.match(/partial$/g) ) {
-      p += 1;
-      var url = window.location.pathname.replace('/d/','/p/'+p+'/');
-      xmlhttp=new XMLHttpRequest();
-      xmlhttp.open("GET",url,false);
-      xmlhttp.send();
-      if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-        d.innerHTML += xmlhttp.responseText;
-        if( xmlhttp.responseText.match(/^[ \t\n]*$/g) ) {
-          d.className = d.className.replace('partial','');
-        }
-      }
-    }
-  }, 1000);
-</script>
-{% end %}
-
 {% block content %}
   {% include "_header.html" %}
-  {% if not current_user %}
+  {# if not current_user %}
 <script type="text/javascript"><!--
 google_ad_client = "ca-pub-5337724371832819";
 /* horizontal 2 */
@@ -38,7 +15,7 @@ google_ad_height = 90;
 <script type="text/javascript"
 src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 </script>
-  {% end %}
+  {% end #}
   {% if meta.get("source","") %}
   <section>
     <b>Data Source:</b> <a href="{{ meta.get("source","") }}">{{ meta.get("sourcename","") or meta.get("source","") }}</a>
@@ -66,6 +43,16 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     </tr>
     {% include "document_page.html" %}
   </table>
+  <section>
+    {% if p>0 %}
+    <a href="/d/{{ p-1 }}/{{ q }}">&lt;&lt; Previous Page<a>
+    {% end %}
+    {% if p>0 and partial %}&nbsp;&nbsp;{% end %}
+    {% if partial %}
+    <a href="/d/{{ p+1 }}/{{ q }}">Next Page &gt;&gt;</a>
+    {% end %}
+  </section>
+
   {% include "_related.html" %}
   {% include "_footer.html" %}
 {% end %}

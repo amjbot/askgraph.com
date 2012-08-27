@@ -9,7 +9,7 @@
     {% import urllib %}
     {% for h in headers %}
     <tr>
-      <td><a href="/d/{{ urllib.quote(h.key) }}">{{ h.val }}</a></td>
+      <td><a href="/d/0/{{ urllib.quote(h.key) }}">{{ h.val }}</a></td>
     </tr>
     {% end %}
     <tr>
