@@ -29,7 +29,7 @@ def crawl( url, target=None, depth=1, noisy=False ):
         for url in list(sources):
             if url in visited:
                 continue
-            time.sleep(1)
+            time.sleep(0.1)
             visited.add( url )
             try:
                 if noisy:
