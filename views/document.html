@@ -24,7 +24,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
 
   <section>
     {% set q_dataset = q.split("/")[0] %}
-    {% set q_url = "/d/" + q_dataset %}
+    {% set q_url = "/d/0/" + q_dataset %}
     <b><a href="{{ q_url }}">{{ q_dataset }}</a></b> &nbsp;&nbsp;&gt;&nbsp;&nbsp;
     {% for q_part in q.split("/")[1:] %}
       {% set q_url = q_url + "/" + q_part %}
