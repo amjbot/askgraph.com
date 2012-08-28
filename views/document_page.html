@@ -3,7 +3,7 @@
 <tr>
   {% for row in d %}
     {% if linkify(row.val) != row.val %}
-      <td>{% apply linkify %}{{ row.val }}{% end %}</td>
+      <td><a href="{{ row.val }}">{{ row.val.rsplit("/",1)[-1] }}</td>
     {% elif request.path.startswith("/d/") %}
       <td>{{ row.val }}</td>
       {# <td><a href="{{ request.path+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td> #}
