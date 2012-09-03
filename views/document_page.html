@@ -6,10 +6,8 @@
       <td><a href="{{ row.val }}">{{ row.val.rsplit("/",1)[-1] }}</td>
     {% elif request.path.startswith("/d/") %}
       <td>{{ row.val }}</td>
-      {# <td><a href="{{ request.path+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td> #}
     {% else %}
       <td>{{ row.val }}</td>
-      {# <td><a href="{{ "/d/"+request.path.split('/',3)[3]+"/"+urllib.quote(row.key+":"+row.val) }}">{{ row.val }}</a></td> #}
     {% end %}
   {% end %}
 </tr>

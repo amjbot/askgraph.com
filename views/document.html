@@ -3,19 +3,6 @@
 
 {% block content %}
   {% include "_header.html" %}
-  {# if not current_user %}
-<script type="text/javascript"><!--
-google_ad_client = "ca-pub-5337724371832819";
-/* horizontal 2 */
-google_ad_slot = "1256307624";
-google_ad_width = 728;
-google_ad_height = 90;
-//-->
-</script>
-<script type="text/javascript"
-src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
-</script>
-  {% end #}
   {% if meta.get("source","") %}
   <section>
     <b>Data Source:</b> <a href="{{ meta.get("source","") }}">{{ meta.get("sourcename","") or meta.get("source","") }}</a>
@@ -23,14 +10,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
   {% end %}
 
   <section>
-    {% set q_dataset = q.split("/")[0] %}
-    {% set q_url = "/d/0/" + q_dataset %}
-    <b><a href="{{ q_url }}">{{ q_dataset }}</a></b> &nbsp;&nbsp;&gt;&nbsp;&nbsp;
-    {% for q_part in q.split("/")[1:] %}
-      {% set q_url = q_url + "/" + q_part %}
-      <b><a href="{{ q_url }}">{{ q_part }}</a></b>
-      &nbsp;&nbsp;&gt;&nbsp;&nbsp;
-    {% end %}
+    <b><a href="/d/0/{{ q }}">{{ q }}</a></b> &nbsp;&nbsp;&gt;&nbsp;&nbsp;
     <b><a href="/download/{{ p }}/{{ q }}">download as csv</a></b>
   </section>
   
@@ -38,7 +18,7 @@ src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
     <tr>
       {% import urllib %}
       {% for row in header %}
-        <th><a href="{{ request.path+"/"+urllib.quote(row.key) }}">{{ row.val }}</a></th>
+        <th>{{ row.val }}</th>
       {% end %}
     </tr>
     {% include "document_page.html" %}

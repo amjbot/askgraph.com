@@ -29,6 +29,8 @@ def crawl( url, target=None, depth=1, noisy=False ):
         for url in list(sources):
             if url in visited:
                 continue
+            if len(visited)>10000:
+                break
             time.sleep(0.1)
             visited.add( url )
             try:

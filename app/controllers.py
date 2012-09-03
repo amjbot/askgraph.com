@@ -33,7 +33,8 @@ def csv_repr( v ):
         return repr(v)
     else:
         return '"' + v.replace('"','\\"') + '"'
-        
+
+
 
 class index( tornado.web.RequestHandler ):
     def get( self ):
@@ -88,18 +89,11 @@ class crawl( tornado.web.RequestHandler ):
         target = self.get_argument("target")
         db.execute("INSERT arrows(source,target) VALUES(%s,%s)",source,target)
 
-def query_document( doc, page=0, perpage=999999 ):
-    dataset = doc[0]
-    query = doc[1:]
-    rows = {}
-    columns = set()
-    for q in query:
-        if ':' in q:
-            k,v = q.split(':',1)
-            rows[k] = v
-        else:
-            columns.add(q)
+def query_document( dataset, rows={}, columns=[], page=0, perpage=999999 ):
+    columns = set(columns)
     header = db.get("SELECT * FROM document_headers WHERE dataset=%s", dataset)
+    if not header:
+        raise tornado.web.HTTPError(404)
     rheader = dict((v,k) for (k,v) in header.items())
     columns = set(rheader[k] for k in columns)
     documents = db.query("SELECT * FROM documents WHERE dataset=%s"\
@@ -120,20 +114,14 @@ PERPAGE = 300
 class document( tornado.web.RequestHandler ):
     def get( self, p, q ):
         p = int(p)
-        query = q.split('/')
-        if len(query) < 1:
-            raise tornado.web.HTTPError(400)
-        meta,header,documents = query_document(query, page=p, perpage=PERPAGE)
+        meta,header,documents = query_document(q, page=p, perpage=PERPAGE)
         partial = len(documents)==PERPAGE
         self.render( "document.html", p=p, q=q, meta=meta, header=header, documents=documents, partial=partial)
 
 class download( tornado.web.RequestHandler ):
     def get( self, p, q ):
         p = int(p)
-        query = q.split('/')
-        if len(query) < 1:
-            raise tornado.web.HTTPError(400)
-        meta,header,documents = query_document(query, page=p, perpage=PERPAGE)
+        meta,header,documents = query_document(q, page=p, perpage=PERPAGE)
         self.set_header('Content-Type', 'text/csv')
         self.set_header('Content-Disposition', 'attachment; filename='+meta["dataset"]+'.csv')
         output = ",".join( csv_repr(c.val) for c in header )
@@ -152,3 +140,4 @@ class sitemap( tornado.web.RequestHandler ):
             for p in range(row['count(*)'] / PERPAGE):
                 loc.append( "http://www.askgraph.com/d/" + str(p) + "/" + urllib.quote(row.dataset))
         self.render( "sitemap.xml", loc=loc )
+
