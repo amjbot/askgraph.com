@@ -8,27 +8,27 @@
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       {% if handler.get_argument("success","") %}
-      <div class="alert alert-success" id="alert-success">
-          <button type="button" class="close" data-dismiss="alert" onclick="$("#alert-success").remove()">×</button>
-          <center>{{ handler.get_argument("success") }}</center>
+      <div class="alert alert-success">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <center>{{ handler.get_argument("success") }}</center>
       </div>
       {% end %}
       {% if handler.get_argument("info","") %}
-      <div class="alert alert-info" id="alert-info">
-          <button type="button" class="close" data-dismiss="alert" onclick="$("#alert-info").remove()">×</button>
-          <center>{{ handler.get_argument("info") }}</center>
+      <div class="alert alert-info">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <center>{{ handler.get_argument("info") }}</center>
       </div>
       {% end %}
       {% if handler.get_argument("alert","") %}
-      <div class="alert" id="alert-alert" id="alert-alert">
-          <button type="button" class="close" data-dismiss="alert" onclick="$("#alert-alert").remove()">×</button>
-          <center>{{ handler.get_argument("alert") }}</center>
+      <div class="alert">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <center>{{ handler.get_argument("alert") }}</center>
       </div>
       {% end %}
       {% if handler.get_argument("error","") %}
-      <div class="alert alert-error" id="alert-error">
-          <button type="button" class="close" data-dismiss="alert" onclick="$("#alert-error").remove()">×</button>
-          <center>{{ handler.get_argument("error") }}</center>
+      <div class="alert alert-error">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <center>{{ handler.get_argument("error") }}</center>
       </div>
       {% end %}
     </div>
@@ -39,25 +39,7 @@
       </div>
     </header>
     {% block content %}{% end %}
-    <footer class="footer">
-      <div class="container">
-        <p class="pull-right"><a href="#">Back to top</a></p>
-      </div>
-    </footer>
     <script src="/static/js/jquery.js"></script>
-    <script src="/static/js/google-code-prettify/prettify.js"></script>
-    <script src="/static/js/bootstrap-transition.js"></script>
     <script src="/static/js/bootstrap-alert.js"></script>
-    <script src="/static/js/bootstrap-modal.js"></script>
-    <script src="/static/js/bootstrap-dropdown.js"></script>
-    <script src="/static/js/bootstrap-scrollspy.js"></script>
-    <script src="/static/js/bootstrap-tab.js"></script>
-    <script src="/static/js/bootstrap-tooltip.js"></script>
-    <script src="/static/js/bootstrap-popover.js"></script>
-    <script src="/static/js/bootstrap-button.js"></script>
-    <script src="/static/js/bootstrap-collapse.js"></script>
-    <script src="/static/js/bootstrap-carousel.js"></script>
-    <script src="/static/js/bootstrap-typeahead.js"></script>
-    <script src="/static/js/bootstrap-affix.js"></script>
   </body>
 </html>

@@ -9,6 +9,9 @@ status:
 stop:
 	sudo supervisorctl stop all
 
+db:
+	mysql -u root -proot root
+
 restore-database:
 	./scripts/download_s3.py backups/daily.sql.tar.gz
 	tar -xzf daily.sql.tar.gz

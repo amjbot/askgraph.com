@@ -7,9 +7,6 @@ CREATE TABLE IF NOT EXISTS requests (
     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     email VARBINARY(500) NOT NULL,
     request TEXT NOT NULL,
-    bid DOUBLE,
-    bid_currency NOT NULL DEFAULT 'USD',
-    previous DATETIME,
-    period DATETIME,
+    ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY(email)
 );

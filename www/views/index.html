@@ -1,11 +1,18 @@
 {% extends "base.html" %}
-
+	
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="span6 offset3">
-      <form>
-        <input type="text" name="email" placeholder="Email">
+    <div class="span6 offset3" style="margin-top: 42px">
+      <form method="post" action="/">
+        {% module xsrf_form_html() %}
+        <fieldset>
+          <input class="span6" type="text" name="email" placeholder="Email">
+        <fieldset>
+        <fieldset>
+          <textarea class="span6" rows="13" name="request" placeholder="Request"></textarea>
+        </fieldset>
+        <button type="submit" class="btn">Submit</button>
       </form>
     </div>
   </div>
