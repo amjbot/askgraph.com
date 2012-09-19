@@ -26,3 +26,5 @@ class index( tornado.web.RequestHandler ):
         else:
             db.execute("INSERT INTO requests(contact,request,context) VALUES(%s,%s,%s)", contact, request, context)
             self.redirect("/?success=Your+request+is+being+reviewed.")
+
+
