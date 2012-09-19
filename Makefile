@@ -27,3 +27,9 @@ tail-log:
 
 tail-err:
 	sudo tail -1000 /var/log/supervisor/askgraph-stderr*.log
+
+smtp-log:
+	sudo tail -1000 /var/log/supervisor/asksmtp-stdout*.log
+
+smtp-err:
+	sudo tail -1000 /var/log/supervisor/asksmtp-stderr*.log
