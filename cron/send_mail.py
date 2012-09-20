@@ -2,28 +2,25 @@
 
 
 import smtplib
-import tornado.template
+import tornado.database
+import json
 import os
 import os.path
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 
-template_loader = tornado.template.Loader( os.path.join(os.path.dirname(__file__),'views') )
-email_template = template_loader.load('email.html')
+db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
 
 
-def send( from_email, to_email, subject, message ):
+def send( from_email, to_emails, data ):
     s = smtplib.SMTP()
     s.connect('email-smtp.us-east-1.amazonaws.com',25)
     s.starttls()
     s.login('AKIAJI6B5SDZHOPEYZSA','Ahst9zkrH0T2ma+JlCnKN1NFWKFWJWJWBpjTfIxqJY5O')
-    msg = MIMEText( email_template.generate(message=message), 'html' )
-    msg['Subject'] = subject
-    msg['From'] = from_email
-    msg['To'] = to_email
-    s.sendmail(from_email,[to_email], msg.as_string() )
+    s.sendmail(from_email,to_emails,data)
     s.quit()
 
 
-send( from_email='asdfasdfasdfasdf@askgraph.com', to_email='sleepdev@gmail.com', subject='Subject', message='Message' )
+for outgoing in db.query("SELECT * FROM smtp_outgoing ORDER BY ts ASC LIMIT 20"):
+    outgoing.rcpttos = json.loads(outgoing.rcpttos)
+    send( from_email=outgoing.mailfrom, to_emails=outgoing.rcpttos, data=outgoing.data )
+    db.execute("DELETE FROM smtp_outgoing WHERE id=%s", outgoing.id)

@@ -1,2 +1,3 @@
 0 0 * * * /home/ubuntu/askgraph.com/cron/backup_database.py
 0 0 * * * /home/ubuntu/askgraph.com/cron/backup_sources.py
+1 * * * * /home/ubuntu/askgraph.com/cron/send_mail.py
