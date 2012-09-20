@@ -3,6 +3,9 @@
 
 import sys
 import tornado.database
+import json
+import random
+import string
 
 
 db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
@@ -13,16 +16,22 @@ def push( ticket_id ):
     thread = db.query("SELECT * FROM request_responses WHERE request_id=%s ORDER BY ts asc", ticket_id)
 if len(sys.argv)==3 and sys.argv[1]=='push': 
     ticket_id = int(sys.argv[2])
-    push( ticket_id=ticket_id )
+    push( ticket_id = ticket_id )
 
 
 def edit( ticket_id ):
     request = db.get("SELECT * FROM requests WHERE id=%s", ticket_id)
     thread = db.query("SELECT * FROM request_responses WHERE request_id=%s ORDER BY ts asc", ticket_id)
-    print 'Not implemented'
+    if len(thread)==0 or thread[-1].contact==request.contact:
+        contact = (db.get("SELECT contact FROM request_responses WHERE request_id=%s AND contact LIKE '%%@askgraph.com'",request.id) \
+            or {'contact': ''.join(random.choice(string.letters + string.digits) for x in range(16)) })["contact"]
+        db.execute("INSERT INTO request_responses(request_id,contact,comment,context) VALUES(%s,%s,%s,%s)",
+            request.id, contact, '', json.dumps({}) )
+    t = db.get("SELECT * FROM request_responses WHERE request_id=%s ORDER BY ts desc", ticket_id)
+    print t.request_id, t.id
 if len(sys.argv)==3 and sys.argv[1]=='edit': 
     ticket_id = int(sys.argv[2])
-    edit( ticket_id=ticket_id )
+    edit( ticket_id = ticket_id )
 
 
 if len(sys.argv)==2 and sys.argv[1]=='edit': 
@@ -40,14 +49,3 @@ if len(sys.argv)==2 and sys.argv[1]=='edit':
     edit( ticket_id = d.id )
 
 
-'''
-CREATE TABLE IF NOT EXISTS request_responses (
-    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    request_id INT NOT NULL,
-    contact VARBINARY(500) NOT NULL,
-    comment TEXT NOT NULL,
-    context TEXT NOT NULL,
-    ts TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    KEY(request_id)
-);
-'''    
