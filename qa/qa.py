@@ -21,6 +21,7 @@ if len(sys.argv)==3 and sys.argv[1]=='push':
     push( ticket_id = ticket_id )
 
 
+"""
 def edit( ticket_id ):
     request = db.get("SELECT * FROM requests WHERE id=%s", ticket_id)
     thread = db.query("SELECT * FROM request_responses WHERE request_id=%s ORDER BY ts asc", ticket_id)
@@ -67,5 +68,4 @@ if len(sys.argv)==2 and sys.argv[1]=='edit':
         except:
             print 'Document id not found, try again.'
     edit( ticket_id = d.id )
-
-
+"""
