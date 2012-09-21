@@ -1,4 +1,4 @@
-
+grok_enabled = False
 symbol_table = {}
 index = {}
 
@@ -15,7 +15,9 @@ def napp( context, op, value ):
     assert isinstance(context,dict)
     for fx in split(op,';'):
         assert len(fx)>0, fx
-        assert fx[0] in symbol_table, fx[0]
+        if fx[0] not in symbol_table:
+            print "Undefined instruction: %s" % fx[0]
+            exit()
         r = symbol_table[fx[0]]( context, value, *fx[1:] )
     return r
 
@@ -23,6 +25,9 @@ def index_insert( symbol, require, effects ):
     index[symbol] = index.get(symbol,[]) + [(require,effects)]
 
 def index_apply( context, symbol ):
+    if symbol not in index and not grok_enabled:
+        print "Undefined symbol: %s" % repr(symbol)
+        exit()
     for require,effects in index.get(symbol,[]):
         if not all(napp(context,require[c],context.get(c,None)) for c in require):
            continue
@@ -64,3 +69,9 @@ def __add__( ctx, x, y ):
     else: assert False
 symbol_table['+'] = __add__
 
+def noun( ctx, x, y ):
+    return dict( (k,v) for (k,v) in ({
+        'topic': y,
+        'object': ctx.get('topic',None)
+    }).items() if v is not None)
+symbol_table['noun'] = noun

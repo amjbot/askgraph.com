@@ -53,3 +53,6 @@
 [" ",{},{"word":["apply",";","clear"]}]
 ["\t",{},{"word":["apply",";","clear"]}]
 ["\n",{},{"word":["apply",";","clear"]}]
+["apple",{},{"topic":["noun","apple"]}]
+["stock",{},{"topic":["noun","stock"]}]
+["price",{},{"topic":["noun","price"]}]
