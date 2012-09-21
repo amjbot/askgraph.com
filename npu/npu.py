@@ -3,10 +3,12 @@ import sys
 import signal
 import json
 import time
+import npu_effects
 
 
 wmem = [{}]
 index = {}
+effects = npu_effects.symbol_table
 
 
 def signal_forget(signum,frame):
@@ -16,15 +18,10 @@ def signal_remember(signum,frame):
 
 
 def null_step( symbol ):
-    return [ ({},['error', "Invalid character: %s." % repr(symbol)]) ]
+    return [ ({},{'error':['error', "Invalid character: %s." % repr(symbol)]}) ]
 def null_wmem():
     print "Dead end."
     exit()
-
-import npu_effects
-effects = {
-  '+': npu_effects.__add__,
-}
 
 
 def split( list, sep ):
