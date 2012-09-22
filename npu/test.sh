@@ -1,4 +1,4 @@
 #!/bin/sh
 
-npu test.npl < test.txt
+npu test.npl --format=html < test.txt
 
