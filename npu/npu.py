@@ -3,8 +3,7 @@ import sys
 import signal
 import json
 import time
-from npu_instructions import index_insert, index_apply
-from npu_destinations import ideal_render
+from npu_instructions import index_insert, index_apply, ideal_render, db
 
 
 wmem = {}

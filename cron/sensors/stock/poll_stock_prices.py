@@ -22,7 +22,7 @@ db = tornado.database.Connection(host="localhost",user="root",database="root",pa
 #{'topic': u'price', 'object': {'topic': u'stock', 'object': {'topic': u'apple'}}}
 
 fields = [
-   ('b2', 'Ask (Real-time)'),
+   ('b2', 'price'),
    ('b3', 'Bid (Real-time)'),
    ('b4', 'Book Value'),
    ('d', 'Dividend/Share'),

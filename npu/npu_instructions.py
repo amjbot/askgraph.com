@@ -1,6 +1,30 @@
 grok_enabled = False
 symbol_table = {}
 index = {}
+import json
+import tornado.database
+
+db = tornado.database.Connection(host="localhost",user="root",database="root",password="root")
+
+
+def ideal_expand( ideal, limit=30 ):
+    source = json.dumps(ideal)
+    l = db.query("SELECT target,ts FROM observations WHERE source=%s ORDER BY ts DESC",source)
+    for i in l:
+        i['ts'] = i.ts.isoformat()
+    return {"source":ideal, "results":l}
+
+
+def ideal_render( wmem, format ):
+    if format=='json':
+        return json.dumps(wmem)
+    elif format=='ideal':
+        if 'topic' in wmem:
+            return json.dumps( ideal_expand(wmem['topic']) )
+        else:
+            raise Exception('Unexpected ideal query format: %s', json.dumps(wmem))
+    else:
+        raise Exception('Unknown npu destination: %s' % format)
 
 
 def split( list, sep ):
@@ -70,8 +94,13 @@ def __add__( ctx, x, y ):
 symbol_table['+'] = __add__
 
 def noun( ctx, x, y ):
-    return dict( (k,v) for (k,v) in ({
+    r = dict( (k,v) for (k,v) in ({
         'topic': y,
         'object': ctx.get('topic',None)
     }).items() if v is not None)
+    alias = db.get("SELECT * FROM alias WHERE source=%s LIMIT 1", json.dumps(r))
+    if alias:
+        return json.loads(alias.target)
+    else:
+        return r
 symbol_table['noun'] = noun
