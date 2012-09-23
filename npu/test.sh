@@ -1,4 +1,4 @@
 #!/bin/sh
 
-npu test.npl --format=$1 < test.txt
+npu languages/english.npl --format=$1 < test.txt
 

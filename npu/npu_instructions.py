@@ -37,13 +37,16 @@ def split( list, sep ):
     return r
 def napp( context, op, value ):
     assert isinstance(context,dict)
+    for i in range(len(op)):
+        if op[i].startswith("$"):
+            op[i] = context.get(op[i][1:],None)
     for fx in split(op,';'):
         assert len(fx)>0, fx
         if fx[0] not in symbol_table:
             print "Undefined instruction: %s" % fx[0]
             exit()
-        r = symbol_table[fx[0]]( context, value, *fx[1:] )
-    return r
+        value = symbol_table[fx[0]]( context, value, *fx[1:] )
+    return value
 
 def index_insert( symbol, require, effects ):
     index[symbol] = index.get(symbol,[]) + [(require,effects)]
@@ -56,17 +59,24 @@ def index_apply( context, symbol ):
         if not all(napp(context,require[c],context.get(c,None)) for c in require):
            continue
         for c in effects:
-            r = napp(context,effects[c],context.get(c,None))
-            if r is None:
-                context.pop(c,None)
+            if isinstance(effects[c],list):
+                r = napp(context,effects[c],context.get(c,None))
+                if r is None:
+                    context.pop(c,None)
+                else:
+                    context[c] = r
             else:
-                context[c] = r
+                context[c] = effects[c]
 symbol_table['apply'] = index_apply
 
 
 def _print( ctx, x ):
     print repr(x)
 symbol_table['print'] = _print
+
+def exists( ctx, x ):
+    return True if x else False
+symbol_table['exists'] = exists
 
 def clear( ctx, x ):
     return None
