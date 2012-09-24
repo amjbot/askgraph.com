@@ -14,6 +14,7 @@ def signal_remember(signum,frame):
 
 
 def main():
+    global wmem
     signal.signal(signal.SIGUSR1, signal_forget)
     signal.signal(signal.SIGUSR2, signal_remember)
     options = {}
@@ -37,9 +38,9 @@ def main():
             index_insert( t.symbol, json.loads(t.requires), json.loads(t.effects) )
     while True:
         c = sys.stdin.read(1)
+        wmem = index_apply( wmem, c )
         if c=='':
             break
-        index_apply( wmem, c )
     print ideal_render(wmem, format=options.get("format","json"))
 
 
